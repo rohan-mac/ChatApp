@@ -42,15 +42,10 @@ export const useChatStore = create((set, get) => ({
   },
 
   loadPeople: async (search = '') => {
-    set({ loadingPeople: true });
-    try {
-      const { data } = await api.get('/users', {
-        params: { search: search || undefined, limit: 12 }
-      });
-      set({ people: unpackData(data) || [] });
-    } finally {
-      set({ loadingPeople: false });
-    }
+    const { data } = await api.get('/users', {
+      params: { search: search || undefined, limit: 8 }
+    });
+    set({ people: unpackData(data) || [] });
   },
 
   openChat: async (chat) => {

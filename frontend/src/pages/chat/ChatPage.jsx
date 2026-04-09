@@ -6,7 +6,6 @@ import ChatList from '../../components/chat/ChatList';
 import ChatWindow from '../../components/chat/ChatWindow';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import useDebouncedValue from '../../hooks/useDebouncedValue';
 import { useSocket } from '../../hooks/useSocket';
 import useThemeMode from '../../hooks/useThemeMode';
 import { useChatStore } from '../../store/chatStore';
@@ -30,7 +29,6 @@ const ChatPage = () => {
   const isDark = theme === 'dark';
 
   const [chatSearch, setChatSearch] = useState('');
-  const [peopleSearch, setPeopleSearch] = useState('');
   const [draft, setDraft] = useState('');
   const [attachment, setAttachment] = useState(null);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -44,7 +42,6 @@ const ChatPage = () => {
   const endRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const deferredChatSearch = useDeferredValue(chatSearch);
-  const debouncedPeopleSearch = useDebouncedValue(peopleSearch, 250);
 
   const chats = useChatStore((state) => state.chats);
   const messages = useChatStore((state) => state.messages);
@@ -52,11 +49,8 @@ const ChatPage = () => {
   const loadingChats = useChatStore((state) => state.loadingChats);
   const loadingPeople = useChatStore((state) => state.loadingPeople);
   const loadingMessages = useChatStore((state) => state.loadingMessages);
-  const people = useChatStore((state) => state.people);
   const loadChats = useChatStore((state) => state.loadChats);
-  const loadPeople = useChatStore((state) => state.loadPeople);
   const openChat = useChatStore((state) => state.openChat);
-  const createDirectChat = useChatStore((state) => state.createDirectChat);
   const sendMessage = useChatStore((state) => state.sendMessage);
   const editMessage = useChatStore((state) => state.editMessage);
   const toggleStar = useChatStore((state) => state.toggleStar);
@@ -76,16 +70,6 @@ const ChatPage = () => {
       });
     });
   }, [deferredChatSearch, loadChats, pushToast]);
-
-  useEffect(() => {
-    loadPeople(debouncedPeopleSearch).catch(() => {
-      pushToast({
-        title: 'Unable to load users',
-        description: 'Please check your connection and try again.',
-        tone: 'error'
-      });
-    });
-  }, [debouncedPeopleSearch, loadPeople, pushToast]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -186,18 +170,6 @@ const ChatPage = () => {
     }
   };
 
-  const handleCreateChat = async (receiverId) => {
-    try {
-      await createDirectChat(receiverId);
-    } catch (error) {
-      pushToast({
-        title: 'Unable to start chat',
-        description: error.response?.data?.message || 'Please try again in a moment.',
-        tone: 'error'
-      });
-    }
-  };
-
   return (
     <AppShell
       title={selectedChat ? chatName(selectedChat) : 'Chats'}
@@ -228,11 +200,6 @@ const ChatPage = () => {
             query={chatSearch}
             onQueryChange={setChatSearch}
             onOpenChat={openChat}
-            people={people}
-            peopleLoading={loadingPeople}
-            peopleQuery={peopleSearch}
-            onPeopleQueryChange={setPeopleSearch}
-            onCreateChat={handleCreateChat}
             getChatName={chatName}
             getPreview={previewText}
             isDark={isDark}
