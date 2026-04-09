@@ -38,13 +38,12 @@ const DashboardPage = () => {
           </ul>
         </div>
         <div className="rounded bg-slate-900 p-4">
-          <h3 className="mb-2 font-semibold">Daily active users</h3>
+          <h3 className="mb-2 font-semibold">Reports per day</h3>
           <ul className="text-sm text-slate-300">
-            {stats.analytics.dailyActiveUsers.map((item) => (
+            {stats.analytics.reportsPerDay.map((item) => (
               <li key={item._id}>{item._id}: {item.count}</li>
             ))}
           </ul>
-          <p className="mt-3 text-emerald-400">User growth: {stats.analytics.userGrowthPct}%</p>
         </div>
       </div>
     </div>

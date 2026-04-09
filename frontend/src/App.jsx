@@ -16,7 +16,15 @@ const SettingsPage = lazy(() => import('./pages/admin/SettingsPage'));
 
 const App = () => (
   <BrowserRouter>
-    <Suspense fallback={<div className="p-10">Loading...</div>}>
+    <Suspense
+      fallback={(
+        <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,_rgba(123,191,255,0.2),_transparent_24%),linear-gradient(170deg,_#050914_0%,_#0a1220_58%,_#050914_100%)]">
+          <div className="rounded-[28px] border border-white/10 bg-white/5 px-8 py-6 text-white shadow-2xl backdrop-blur-2xl">
+            Loading interface...
+          </div>
+        </div>
+      )}
+    >
       <Routes>
         <Route path="/" element={<Navigate to="/chat" replace />} />
         <Route path="/login" element={<LoginPage />} />

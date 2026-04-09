@@ -1,53 +1,37 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import client from '../api/client';
+import { createContext, useContext, useEffect, useMemo } from 'react';
+import { authSelectors, useAuthStore } from '../store/authStore';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const hydrate = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data } = await client.get('/auth/me');
-      setUser(data.user);
-    } catch (error) {
-      localStorage.removeItem('token');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const user = useAuthStore(authSelectors.user);
+  const loading = useAuthStore(authSelectors.loading);
+  const initialized = useAuthStore(authSelectors.initialized);
+  const hydrate = useAuthStore((state) => state.hydrate);
+  const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
+  const updateUser = useAuthStore((state) => state.updateUser);
 
   useEffect(() => {
-    hydrate();
-  }, []);
-
-  const login = ({ token, user: currentUser }) => {
-    localStorage.setItem('token', token);
-    setUser(currentUser);
-  };
-
-  const logout = async () => {
-    try {
-      await client.post('/auth/logout');
-    } catch (error) {
-      // ignore network errors during logout
+    if (!initialized) {
+      hydrate().catch(() => {
+        // handled in store
+      });
     }
-    localStorage.removeItem('token');
-    setUser(null);
-  };
+  }, [hydrate, initialized]);
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, logout, setUser }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      login,
+      logout,
+      setUser: updateUser
+    }),
+    [login, loading, logout, updateUser, user]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

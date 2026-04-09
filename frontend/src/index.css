@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: dark;
-  font-family: "SF Pro Display", "SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif;
+  font-family: "SF Pro Display", "SF Pro Text", "Segoe UI", "Helvetica Neue", Inter, system-ui, sans-serif;
 }
 
 html,
@@ -16,8 +16,13 @@ body,
 body {
   margin: 0;
   background: #04070d;
+  color: #fff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::selection {
+  background: rgba(59, 130, 246, 0.28);
 }
 
 html[data-theme='light'] {
@@ -30,6 +35,18 @@ html[data-theme='dark'] {
 
 * {
   box-sizing: border-box;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
 }
 
 .minimal-scrollbar {

@@ -27,7 +27,7 @@ const UsersPage = () => {
               <p className="font-semibold">{u.name} <span className="text-xs text-slate-400">({u.role})</span></p>
               <p className="text-sm text-slate-400">{u.email}</p>
             </div>
-            <button className="rounded bg-amber-600 px-3 py-1 text-xs" onClick={() => action(() => client.patch(`/users/block/${u._id}`))}>{u.isBlocked ? 'Unblock' : 'Block'}</button>
+            <button className="rounded bg-amber-600 px-3 py-1 text-xs" onClick={() => action(() => client.patch(`/users/moderation/block/${u._id}`))}>{u.isBlocked ? 'Unblock' : 'Block'}</button>
             <button className="rounded bg-indigo-600 px-3 py-1 text-xs" onClick={() => action(() => client.patch(`/users/promote/${u._id}`))}>Promote</button>
             <button className="rounded bg-red-600 px-3 py-1 text-xs" onClick={() => action(() => client.delete(`/admin/user/${u._id}`))}>Delete</button>
           </div>
