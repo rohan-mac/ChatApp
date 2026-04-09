@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import api from '../services/api';
 
+const unpackData = (payload) => payload?.data || payload;
+
+const normalizeMessage = (message = {}) => ({
+  ...message,
+  text: message.text || message.content || ''
+});
+
 const upsertById = (list, item) => {
   const index = list.findIndex((entry) => entry._id === item._id || (entry.clientMessageId && entry.clientMessageId === item.clientMessageId));
   if (index === -1) {
@@ -17,6 +24,7 @@ export const useChatStore = create((set, get) => ({
   messages: [],
   selectedChat: null,
   loadingChats: false,
+  loadingPeople: false,
   loadingMessages: false,
   people: [],
   messageSearchResults: [],
@@ -27,24 +35,29 @@ export const useChatStore = create((set, get) => ({
       const { data } = await api.get('/chats', {
         params: { archived: false, search: search || undefined }
       });
-      set({ chats: data.data || [] });
+      set({ chats: unpackData(data) || [] });
     } finally {
       set({ loadingChats: false });
     }
   },
 
   loadPeople: async (search = '') => {
-    const { data } = await api.get('/users', {
-      params: { search: search || undefined, limit: 8 }
-    });
-    set({ people: data.data || [] });
+    set({ loadingPeople: true });
+    try {
+      const { data } = await api.get('/users', {
+        params: { search: search || undefined, limit: 12 }
+      });
+      set({ people: unpackData(data) || [] });
+    } finally {
+      set({ loadingPeople: false });
+    }
   },
 
   openChat: async (chat) => {
     set({ selectedChat: chat, loadingMessages: true, messages: [] });
     try {
       const { data } = await api.get(`/messages/${chat._id}`);
-      set({ messages: data.data || [], loadingMessages: false });
+      set({ messages: (unpackData(data) || []).map(normalizeMessage), loadingMessages: false });
     } catch (error) {
       set({ loadingMessages: false });
       throw error;
@@ -54,31 +67,35 @@ export const useChatStore = create((set, get) => ({
   createDirectChat: async (receiverId) => {
     const { data } = await api.post('/chats', { receiverId });
     await get().loadChats();
-    await get().openChat(data);
-    return data;
+    const chat = unpackData(data);
+    await get().openChat(chat);
+    return chat;
   },
 
   sendMessage: async (payload) => {
     const { data } = await api.post('/messages', payload);
-    set((state) => ({ messages: upsertById(state.messages, data) }));
+    const message = normalizeMessage(unpackData(data));
+    set((state) => ({ messages: upsertById(state.messages, message) }));
     await get().loadChats();
-    return data;
+    return message;
   },
 
   editMessage: async (messageId, text) => {
     const { data } = await api.patch(`/messages/${messageId}`, { text });
+    const message = normalizeMessage(unpackData(data));
     set((state) => ({
-      messages: state.messages.map((entry) => (entry._id === data._id ? data : entry))
+      messages: state.messages.map((entry) => (entry._id === message._id ? message : entry))
     }));
-    return data;
+    return message;
   },
 
   toggleStar: async (messageId) => {
     const { data } = await api.post(`/messages/${messageId}/star`);
+    const message = normalizeMessage(unpackData(data));
     set((state) => ({
-      messages: state.messages.map((entry) => (entry._id === data._id ? data : entry))
+      messages: state.messages.map((entry) => (entry._id === message._id ? message : entry))
     }));
-    return data;
+    return message;
   },
 
   deleteMessage: async (messageId, scope, currentUserId) => {
@@ -120,14 +137,15 @@ export const useChatStore = create((set, get) => ({
     const { data } = await api.get('/messages/search', {
       params: { q: query }
     });
-    set({ messageSearchResults: data.data || [] });
+    set({ messageSearchResults: unpackData(data) || [] });
   },
 
   handleIncomingMessage: (message) => {
+    const incoming = normalizeMessage(message);
     set((state) => {
-      const isOpen = state.selectedChat?._id === message.chatId;
+      const isOpen = state.selectedChat?._id === incoming.chatId;
       return {
-        messages: isOpen ? upsertById(state.messages, message) : state.messages
+        messages: isOpen ? upsertById(state.messages, incoming) : state.messages
       };
     });
     get().loadChats();
