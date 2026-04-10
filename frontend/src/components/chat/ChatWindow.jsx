@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import EmojiPicker from 'emoji-picker-react';
-import { LoaderCircle, MoreVertical, Search, X } from 'lucide-react';
+import { LoaderCircle, MoreVertical, Phone, Search, Video, X } from 'lucide-react';
 import MessageBubble from '../MessageBubble';
 import InputBar from './InputBar';
 
@@ -33,9 +33,20 @@ const ChatWindow = ({
   setEditTarget,
   editTarget,
   theme
-}) => (
-  <section className={`flex min-h-[78vh] flex-col rounded-[28px] border shadow-[0_20px_48px_rgba(0,0,0,0.2)] backdrop-blur-[20px] ${isDark ? 'border-white/10 bg-[rgba(8,15,25,0.58)]' : 'border-white/70 bg-[rgba(255,255,255,0.63)]'}`}>
-    <header className={`flex items-center gap-3 border-b px-3 py-3 md:px-4 ${isDark ? 'border-white/10' : 'border-white/70'}`}>
+}) => {
+  const isOcean = theme === 'ocean';
+  const isRose = theme === 'rose';
+  const panelBackground = isDark
+    ? 'border-white/10 bg-[rgba(8,15,25,0.58)]'
+    : isOcean
+    ? 'border-cyan-200/20 bg-white/80'
+    : isRose
+    ? 'border-pink-200/20 bg-white/80'
+    : 'border-white/70 bg-[rgba(255,255,255,0.63)]';
+
+  return (
+    <section className={`flex min-h-[78vh] flex-col rounded-[18px] border shadow-[0_10px_30px_rgba(0,0,0,0.12)] ${panelBackground}`}>
+    <header className={`flex items-center gap-3 border-b px-3 py-3 md:px-4 ${isDark ? 'border-white/10 bg-slate-950/80' : 'border-slate-200/80 bg-white/95'}`}>
       <button
         type="button"
         onClick={onBack}
@@ -46,20 +57,20 @@ const ChatWindow = ({
 
       {selectedChat ? (
         <>
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-[#25D366] text-sm font-semibold text-white shadow-lg">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-[#25D366] text-sm font-semibold text-white shadow-sm">
             {getChatName(selectedChat).charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold md:text-base">{getChatName(selectedChat)}</p>
+            <p className="truncate text-sm font-semibold md:text-base text-slate-900 dark:text-white">{getChatName(selectedChat)}</p>
             <p className={`truncate text-xs ${isDark ? 'text-slate-300/80' : 'text-slate-600'}`}>
               {typingText || getChatStatus(selectedChat)}
             </p>
           </div>
-          <button type="button" className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${isDark ? 'bg-white/10 text-slate-200' : 'bg-slate-900/5 text-slate-600'}`}>
-            <Search size={16} />
+          <button type="button" className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${isDark ? 'bg-white/10 text-slate-200' : 'bg-slate-900/5 text-slate-600'}`}>
+            <Phone size={16} />
           </button>
-          <button type="button" className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${isDark ? 'bg-white/10 text-slate-200' : 'bg-slate-900/5 text-slate-600'}`}>
-            <MoreVertical size={16} />
+          <button type="button" className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${isDark ? 'bg-white/10 text-slate-200' : 'bg-slate-900/5 text-slate-600'}`}>
+            <Video size={16} />
           </button>
         </>
       ) : (
@@ -67,7 +78,7 @@ const ChatWindow = ({
       )}
     </header>
 
-    <div className="minimal-scrollbar flex-1 overflow-y-auto px-3 py-4 sm:px-4">
+    <div className={`minimal-scrollbar flex-1 overflow-y-auto px-3 py-4 sm:px-4 ${isDark ? 'bg-slate-950/20' : 'bg-[#f0f2f5]'}`}>
       {!selectedChat ? (
         <div className="flex h-full items-center justify-center text-sm opacity-70">Choose a chat to start messaging.</div>
       ) : loadingMessages ? (
@@ -76,7 +87,7 @@ const ChatWindow = ({
           Loading messages...
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3 py-2">
           {activeMessages.map((message) => (
             <MessageBubble
               key={message._id || message.clientMessageId}
@@ -94,7 +105,7 @@ const ChatWindow = ({
       )}
     </div>
 
-    <div className={`border-t p-3 ${isDark ? 'border-white/10' : 'border-white/70'}`}>
+    <div className={`border-t px-3 pb-3 pt-4 ${isDark ? 'border-white/10 bg-slate-950/90' : 'border-slate-200/80 bg-white/95'}`}>
       <input
         ref={fileRef}
         type="file"
@@ -121,6 +132,7 @@ const ChatWindow = ({
 
       <InputBar
         isDark={isDark}
+        theme={theme}
         draft={draft}
         onDraftChange={setDraft}
         onToggleEmoji={() => setShowEmoji((current) => !current)}
@@ -157,5 +169,6 @@ const ChatWindow = ({
     </div>
   </section>
 );
+};
 
 export default memo(ChatWindow);

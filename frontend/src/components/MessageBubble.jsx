@@ -24,10 +24,10 @@ const MessageBubble = ({
   const isStarred = message.starredBy?.some((entry) => (entry._id || entry) === currentUserId);
 
   const bubbleClasses = isMine
-    ? 'border border-[#25D366]/35 bg-[rgba(37,211,102,0.2)] text-white shadow-[0_16px_38px_rgba(37,211,102,0.25)]'
+    ? 'bg-[#0084ff] text-white shadow-sm'
     : isDark
-      ? 'border border-white/10 bg-[rgba(255,255,255,0.08)] text-white shadow-[0_16px_38px_rgba(0,0,0,0.2)]'
-      : 'border border-white/70 bg-[rgba(255,255,255,0.72)] text-slate-900 shadow-[0_16px_38px_rgba(148,163,184,0.2)]';
+      ? 'bg-slate-900/80 text-slate-100 shadow-sm'
+      : 'bg-white text-slate-900 shadow-sm';
 
   return (
     <motion.div
@@ -40,7 +40,7 @@ const MessageBubble = ({
         setMenuOpen((current) => !current);
       }}
     >
-      <div className={`relative max-w-[86%] rounded-[20px] px-4 py-2.5 backdrop-blur-[20px] sm:max-w-[70%] ${bubbleClasses}`}>
+      <div className={`relative max-w-[86%] rounded-[22px] px-4 py-3 sm:max-w-[70%] ${bubbleClasses} ${isMine ? 'rounded-br-[4px]' : 'rounded-bl-[4px]'}`}>
         <button
           type="button"
           onClick={() => setMenuOpen((current) => !current)}

@@ -33,6 +33,8 @@ const ChatPage = () => {
   const [attachment, setAttachment] = useState(null);
   const [showEmoji, setShowEmoji] = useState(false);
   const [showConversations, setShowConversations] = useState(true);
+  const [showPeopleMode, setShowPeopleMode] = useState(false);
+  const [chatFilter, setChatFilter] = useState('All');
   const [typingText, setTypingText] = useState('');
   const [editTarget, setEditTarget] = useState(null);
   const [sending, setSending] = useState(false);
@@ -48,8 +50,11 @@ const ChatPage = () => {
   const selectedChat = useChatStore((state) => state.selectedChat);
   const loadingChats = useChatStore((state) => state.loadingChats);
   const loadingMessages = useChatStore((state) => state.loadingMessages);
+  const people = useChatStore((state) => state.people);
   const loadChats = useChatStore((state) => state.loadChats);
+  const loadPeople = useChatStore((state) => state.loadPeople);
   const openChat = useChatStore((state) => state.openChat);
+  const createDirectChat = useChatStore((state) => state.createDirectChat);
   const sendMessage = useChatStore((state) => state.sendMessage);
   const editMessage = useChatStore((state) => state.editMessage);
   const toggleStar = useChatStore((state) => state.toggleStar);
@@ -68,7 +73,11 @@ const ChatPage = () => {
         tone: 'error'
       });
     });
-  }, [deferredChatSearch, loadChats, pushToast]);
+    if (deferredChatSearch) {
+      loadPeople(deferredChatSearch).catch(() => {});
+      setShowPeopleMode(false);
+    }
+  }, [deferredChatSearch, loadChats, loadPeople, pushToast]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -108,11 +117,46 @@ const ChatPage = () => {
     }
   }, [selectedChat?._id]);
 
+  const handleOpenChat = async (chat) => {
+    await openChat(chat);
+    if (window.innerWidth < 1024) {
+      setShowConversations(false);
+    }
+  };
+
+  const unreadCount = useMemo(() => chats.filter((chat) => chat.unreadCount > 0).length, [chats]);
+
+  const themeOptions = [
+    { id: 'dark', label: 'Night' },
+    { id: 'ocean', label: 'Ocean' },
+    { id: 'rose', label: 'Rose' }
+  ];
+
+  const rotateTheme = () => {
+    const themeOrder = ['dark', 'ocean', 'rose'];
+    const currentIndex = themeOrder.indexOf(theme);
+    const nextIndex = (currentIndex + 1) % themeOrder.length;
+    setTheme(themeOrder[nextIndex]);
+  };
+
   const filteredChats = useMemo(() => {
     const query = deferredChatSearch.trim().toLowerCase();
-    if (!query) return chats;
-    return chats.filter((chat) => `${chatName(chat)} ${previewText(chat)}`.toLowerCase().includes(query));
-  }, [chats, deferredChatSearch]);
+    let results = chats;
+
+    if (query) {
+      results = results.filter((chat) => `${chatName(chat)} ${previewText(chat)}`.toLowerCase().includes(query));
+    }
+
+    if (chatFilter === 'Unread') {
+      results = results.filter((chat) => chat.unreadCount > 0);
+    }
+
+    if (chatFilter === 'Favourites') {
+      results = [];
+    }
+
+    return results;
+  }, [chats, deferredChatSearch, chatFilter]);
 
   const activeMessages = useMemo(
     () => messages.map((message) => ({ ...message, text: message.text || message.content || 'No content' })),
@@ -169,12 +213,19 @@ const ChatPage = () => {
     }
   };
 
+  const handleNewChat = () => {
+    setChatSearch('');
+    setShowPeopleMode(true);
+    loadPeople('').catch(() => {});
+  };
+
   return (
     <AppShell
-      title={selectedChat ? chatName(selectedChat) : 'Chats'}
-      subtitle="WhatsApp-style flow with premium glass UI"
+      showHeader={false}
       theme={theme}
-      onToggleTheme={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+      themeOptions={themeOptions}
+      onThemeSelect={setTheme}
+      onToggleTheme={rotateTheme}
       actions={selectedChat ? (
         <button
           type="button"
@@ -198,14 +249,22 @@ const ChatPage = () => {
             selectedChatId={selectedChat?._id}
             query={chatSearch}
             onQueryChange={setChatSearch}
-            onOpenChat={openChat}
+            onOpenChat={handleOpenChat}
             getChatName={chatName}
             getPreview={previewText}
             isDark={isDark}
+            theme={theme}
+            people={people}
+            showPeople={showPeopleMode || Boolean(chatSearch.trim())}
+            onSelectUser={(user) => createDirectChat(user._id)}
+            filter={chatFilter}
+            onFilterChange={setChatFilter}
+            unreadCount={unreadCount}
+            onAddChat={handleNewChat}
           />
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={showConversations ? 'hidden lg:block' : 'block'}>
           <ChatWindow
             isDark={isDark}
             selectedChat={selectedChat}
