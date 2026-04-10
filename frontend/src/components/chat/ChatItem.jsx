@@ -37,31 +37,31 @@ const ChatItem = ({ chat, active, onOpen, name, preview, isDark, theme }) => {
     <button
       type="button"
       onClick={() => onOpen(chat)}
-      className={`group flex w-full items-start gap-3 rounded-none border px-4 py-3 text-left transition ${
+      className={`group flex w-full items-start gap-4 rounded-2xl border px-5 py-4 text-left transition-all duration-200 shadow-sm hover:shadow-md ${
         active
-          ? 'border-[#0084ff] bg-[#e8f0ff] shadow-sm'
-          : 'border-transparent bg-white hover:border-slate-200 hover:bg-slate-50'
+          ? 'border-blue-300/50 bg-gradient-to-r from-blue-50 to-purple-50 shadow-lg shadow-blue-500/10'
+          : 'border-transparent bg-white hover:border-slate-200/60 hover:bg-slate-50/80'
       }`}
     >
       <div className="relative shrink-0">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-lg font-semibold text-white shadow-sm">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-lg font-bold text-white shadow-lg">
           {getInitials(name)}
         </div>
         {chat.counterpart?.isOnline ? (
-          <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
+          <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-white bg-emerald-500 shadow-sm"></span>
         ) : null}
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-3">
-          <p className="truncate text-sm font-semibold text-slate-900">{name}</p>
-          {time ? <span className="shrink-0 text-xs text-slate-500">{time}</span> : null}
+          <p className="truncate text-base font-bold text-slate-900 group-hover:text-blue-700 transition-colors duration-200">{name}</p>
+          {time ? <span className="shrink-0 text-xs font-medium text-slate-500">{time}</span> : null}
         </div>
-        <p className="mt-1 truncate text-sm text-slate-500">{preview}</p>
+        <p className="mt-1 truncate text-sm text-slate-600 font-medium">{preview}</p>
       </div>
 
       {badge > 0 ? (
-        <span className="inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-[#0084ff] px-2 py-1 text-xs font-semibold text-white">
+        <span className="inline-flex min-w-[1.75rem] items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
           {badge}
         </span>
       ) : null}

@@ -33,38 +33,38 @@ const ChatList = ({
       }`;
 
   return (
-    <aside className="flex h-full flex-col overflow-hidden border border-slate-200/70 bg-white shadow-lg rounded-none">
-      <div className="sticky top-0 z-10 border-b border-slate-200/70 bg-white px-4 py-4">
-        <div className="flex items-center justify-between gap-3">
+    <aside className="flex h-full flex-col overflow-hidden border border-slate-200/50 bg-gradient-to-br from-white via-slate-50 to-white shadow-xl rounded-3xl">
+      <div className="sticky top-0 z-10 border-b border-slate-200/50 bg-gradient-to-r from-white via-slate-50 to-white px-6 py-5 rounded-t-3xl">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">Chats</p>
-            <h2 className="text-2xl font-semibold text-slate-900">Messenger</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Chats</p>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Messenger</h2>
           </div>
           <button
             type="button"
             onClick={onAddChat}
-            className="inline-flex h-12 w-12 items-center justify-center rounded-none bg-[#0084ff] text-white shadow-lg transition hover:bg-[#006ce5]"
+            className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
           >
-            <Plus size={20} />
+            <Plus size={24} />
           </button>
         </div>
 
-        <div className="mt-4 flex items-center gap-3 rounded-none border border-slate-200 bg-slate-100 px-4 py-3">
-          <Search size={18} className="text-slate-500" />
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-slate-200/60 bg-slate-100/80 px-4 py-3 shadow-sm backdrop-blur-sm">
+          <Search size={20} className="text-slate-500" />
           <input
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Search Messenger"
-            className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+            className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-500 font-medium"
           />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-white px-2 pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-50/30 via-white to-slate-100/30 px-4 pb-6 pt-4">
         {loading ? (
-          <div className="flex items-center gap-2 bg-slate-100 px-4 py-4 text-sm text-slate-500">
-            <LoaderCircle size={16} className="animate-spin" />
-            Loading chats...
+          <div className="flex items-center gap-3 bg-slate-100/80 px-4 py-4 rounded-2xl border border-slate-200/50 shadow-sm">
+            <LoaderCircle size={18} className="animate-spin text-blue-600" />
+            <p className="text-sm font-medium text-slate-600">Loading chats...</p>
           </div>
         ) : showPeople ? (
           people?.length > 0 ? (
@@ -74,23 +74,25 @@ const ChatList = ({
               selectedId={null}
               theme={isDark ? 'dark' : 'light'}
               palette={{
-                selected: 'bg-[#0084ff] text-white',
-                idle: 'bg-white hover:bg-slate-100',
-                accent: 'from-[#0084ff] to-[#006ce5]',
+                selected: 'bg-gradient-to-br from-blue-500 to-purple-600 text-white',
+                idle: 'bg-white hover:bg-slate-100/80 rounded-2xl border border-slate-200/50 shadow-sm',
+                accent: 'from-blue-500 to-purple-600',
                 secondaryText: 'text-slate-500'
               }}
             />
           ) : (
-            <div className="border border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
-              No users found.
+            <div className="border border-dashed border-slate-200/60 bg-slate-50/80 px-6 py-8 text-center rounded-2xl shadow-sm">
+              <p className="text-base font-semibold text-slate-600">No users found</p>
+              <p className="text-sm text-slate-500 mt-1">Try a different search term</p>
             </div>
           )
         ) : chats.length === 0 ? (
-          <div className="border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
-            No chats found.
+          <div className="border border-dashed border-slate-200/60 bg-slate-50/80 px-6 py-8 text-center rounded-2xl shadow-sm">
+            <p className="text-base font-semibold text-slate-600">No chats found</p>
+            <p className="text-sm text-slate-500 mt-1">Start a new conversation</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {chats.map((chat) => (
               <ChatItem
                 key={chat._id}
