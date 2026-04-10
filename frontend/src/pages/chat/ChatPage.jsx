@@ -38,6 +38,13 @@ const ChatPage = () => {
   const [typingText, setTypingText] = useState('');
   const [editTarget, setEditTarget] = useState(null);
   const [sending, setSending] = useState(false);
+  const [chatThemes, setChatThemes] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('chat-themes') || '{}');
+    } catch {
+      return {};
+    }
+  });
 
   const inputRef = useRef(null);
   const fileRef = useRef(null);
@@ -138,6 +145,24 @@ const ChatPage = () => {
     const currentIndex = themeOrder.indexOf(theme);
     const nextIndex = (currentIndex + 1) % themeOrder.length;
     setTheme(themeOrder[nextIndex]);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('chat-themes', JSON.stringify(chatThemes));
+  }, [chatThemes]);
+
+  const currentChatTheme = selectedChat?._id ? chatThemes[selectedChat._id] || theme : theme;
+
+  const setChatTheme = (selectedTheme) => {
+    if (!selectedChat?._id) {
+      setTheme(selectedTheme);
+      return;
+    }
+
+    setChatThemes((current) => ({
+      ...current,
+      [selectedChat._id]: selectedTheme
+    }));
   };
 
   const filteredChats = useMemo(() => {
@@ -310,7 +335,7 @@ const ChatPage = () => {
             }}
             onBack={() => setShowConversations(true)}
             onClearChat={handleClearChat}
-            onSetTheme={setTheme}
+            onSetTheme={setChatTheme}
             endRef={endRef}
             draft={draft}
             setDraft={setDraft}
@@ -325,7 +350,7 @@ const ChatPage = () => {
             attachment={attachment}
             setEditTarget={setEditTarget}
             editTarget={editTarget}
-            theme={theme}
+            theme={currentChatTheme}
           />
         </motion.div>
       </div>

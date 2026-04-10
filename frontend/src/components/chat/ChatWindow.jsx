@@ -38,10 +38,13 @@ const ChatWindow = ({
 }) => {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const isOcean = theme === 'ocean';
+  const isRose = theme === 'rose';
+  const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Night' : theme === 'ocean' ? 'Ocean' : 'Rose';
 
   return (
-    <section className="flex h-full flex-col bg-gradient-to-br from-slate-50 via-white to-slate-100 shadow-2xl rounded-3xl border border-slate-200/50">
-      <header className="flex items-center justify-between gap-4 border-b border-slate-200/60 bg-gradient-to-r from-white via-slate-50 to-white px-6 py-5 shadow-sm rounded-t-3xl">
+    <section className={`flex h-full flex-col rounded-3xl shadow-xl ${isDark ? 'bg-slate-950/95' : isOcean ? 'bg-cyan-50/95' : isRose ? 'bg-rose-50/95' : 'bg-slate-50/95'}`}>
+      <header className={`flex items-center justify-between gap-4 border-b border-slate-200/60 px-6 py-5 shadow-sm rounded-t-3xl ${isDark ? 'bg-gradient-to-r from-slate-900/90 to-slate-950/90' : isOcean ? 'bg-gradient-to-r from-cyan-100 to-sky-100' : isRose ? 'bg-gradient-to-r from-fuchsia-100 to-rose-100' : 'bg-gradient-to-r from-white via-slate-50 to-white'}`}>
         <div className="flex items-center gap-4">
           <button
             type="button"
@@ -76,6 +79,7 @@ const ChatWindow = ({
             <div className="relative">
               <button
                 type="button"
+                title={`Theme: ${themeLabel}`}
                 onClick={() => {
                   setOptionsOpen((current) => !current);
                   setThemeMenuOpen(false);
@@ -144,7 +148,7 @@ const ChatWindow = ({
         <div className="flex h-full items-center justify-center">
           <div className="text-center">
             <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-purple-100">
-              <MessageSquare size={32} className="text-blue-600" />
+              {/* <MessageSquare size={32} className="text-blue-600" /> */}
             </div>
             <p className="text-lg font-semibold text-slate-700">Choose a chat to start messaging</p>
             <p className="text-sm text-slate-500 mt-1">Select a conversation from the sidebar</p>

@@ -92,7 +92,7 @@ const AppShell = ({ children, title, subtitle, theme, onToggleTheme, actions, sh
           />
         ) : null}
 
-        <section className={`relative z-10 min-h-[calc(100vh-1.5rem)] flex-1 ${shellClasses} rounded-3xl border shadow-2xl`}>
+        <section className={`relative z-10 min-h-[calc(100vh-1.5rem)] flex-1 ${shellClasses} rounded-3xl shadow-2xl`}>
           {showHeader ? (
             <header className={`flex items-center justify-between gap-4 border-b px-6 py-5 sm:px-8 ${isDark ? 'border-white/20 bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-sm' : 'border-slate-200/50 bg-gradient-to-r from-white/80 to-slate-50/80 backdrop-blur-sm'}`}>
               <div className="flex items-center gap-4">
