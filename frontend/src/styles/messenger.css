@@ -1,0 +1,79 @@
+.messenger-bg {
+  background: #d9d9d9;
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+  color: #050505;
+  font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.messenger-title {
+  color: #b4b4b4;
+  font-size: 34px;
+  line-height: 41px;
+  font-weight: 300;
+  margin: 0 0 16px;
+}
+
+.phone-frame {
+  width: 265px;
+  height: 521px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-bar {
+  height: 25px;
+  padding: 7px 13px 0;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bottom-home {
+  margin-top: auto;
+  padding: 10px 0 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.bottom-home span {
+  width: 134px;
+  height: 5px;
+  border-radius: 3px;
+  background: #050505;
+}
+
+.screen-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.keyboard {
+  margin-top: auto;
+  height: 180px;
+  background: #bfc5ce;
+  border-top: 1px solid #d6d6d6;
+}
+
+.key-row {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  padding: 4px 4px 0;
+}
+
+.key {
+  height: 30px;
+  border-radius: 4px;
+  background: #f8f8f8;
+}
+
+.key-dark {
+  background: #9fa8b2;
+}
