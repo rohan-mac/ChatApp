@@ -2,8 +2,12 @@ import { useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 
-const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
-  autoConnect: false
+const socket = io(import.meta.env.VITE_SOCKET_URL || 'https://chatapp-pjh9.onrender.com', {
+  autoConnect: false,
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: 5
 });
 
 export const useSocket = (handlers = {}) => {
