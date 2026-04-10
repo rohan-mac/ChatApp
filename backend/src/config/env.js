@@ -34,7 +34,9 @@ const buildCorsOrigins = () => {
   origins.add('http://localhost:5173');
   origins.add('http://localhost:5174');
   origins.add('http://localhost:3000');
-
+  origins.add('https://chat-app-git-main-rohan-macs-projects.vercel.app');
+  origins.add('https://chat-app-tau-ivory.vercel.app');
+  origins.add('capacitor://localhost'); // For mobile apps using Capacitor
   // Add configured client URL
   if (parsed.data.CLIENT_URL) {
     origins.add(parsed.data.CLIENT_URL);
