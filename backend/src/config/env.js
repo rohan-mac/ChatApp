@@ -11,7 +11,6 @@ const schema = z.object({
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
   CLIENT_URL: z.string().default('http://localhost:5173'),
   CLIENT_URLS: z.string().optional(),
-  REDIS_URL: z.string().optional(),
   JSON_LIMIT: z.string().default('5mb'),
   TRUST_PROXY: z.coerce.number().int().min(0).default(0),
   CLOUDINARY_CLOUD_NAME: z.string().optional(),

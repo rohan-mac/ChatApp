@@ -4,7 +4,6 @@ import { Server } from 'socket.io';
 import app from './app.js';
 import { connectDB } from './config/db.js';
 import { env } from './config/env.js';
-import { createRedisClients } from './config/redis.js';
 import { configureSocket } from './socket/socketServer.js';
 import { logger } from './utils/logger.js';
 
@@ -41,9 +40,7 @@ const bootstrap = async () => {
     }
   });
 
-  const redis = await createRedisClients(io);
   app.set('io', io);
-  app.set('redis', redis?.command ?? null);
 
   configureSocket(io);
 
@@ -62,9 +59,6 @@ const bootstrap = async () => {
     logger.info('Graceful shutdown requested', { signal });
     server.close(async () => {
       await mongoose.connection.close();
-      if (redis?.command) await redis.command.quit();
-      if (redis?.pub) await redis.pub.quit();
-      if (redis?.sub) await redis.sub.quit();
       process.exit(0);
     });
   };

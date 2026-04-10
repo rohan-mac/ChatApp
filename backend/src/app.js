@@ -120,26 +120,13 @@ app.use('/api', apiLimiter);
 // Health check endpoint (no auth required)
 // ============================================================================
 app.get('/health', async (req, res) => {
-  const redis = req.app.get('redis');
-  let redisStatus = 'disabled';
-
-  if (redis) {
-    try {
-      await redis.ping();
-      redisStatus = 'up';
-    } catch {
-      redisStatus = 'down';
-    }
-  }
-
   res.json({
     status: 'ok',
     environment: env.NODE_ENV,
     timestamp: new Date().toISOString(),
     cors: {
       allowedOrigins: env.CORS_ORIGINS
-    },
-    services: { redis: redisStatus }
+    }
   });
 });
 
