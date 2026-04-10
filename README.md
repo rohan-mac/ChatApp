@@ -48,35 +48,37 @@ ChatApp/
 
 ## Environment Setup
 
-### Backend
+### Backend Environment Files
 
-Copy `backend/.env.example` to `backend/.env` and fill in values.
+**`backend/.env`** - Your actual backend environment variables (DO NOT commit)
+**`backend/.env.example`** - Template showing required variables
 
-Required fields:
+Copy `backend/.env.example` to `backend/.env` and fill in your values.
 
-```env
-NODE_ENV=development
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_long_jwt_secret
-JWT_REFRESH_SECRET=your_long_refresh_secret
-CLIENT_URL=http://localhost:5173
-CLIENT_URLS=http://localhost:5173
-ACCESS_TOKEN_TTL=15m
-REFRESH_TOKEN_TTL_DAYS=30
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+### Frontend Environment Files
+
+**`frontend/.env`** - Your actual frontend environment variables (DO NOT commit)
+**`frontend/.env.example`** - Template showing required variables
+
+Copy `frontend/.env.example` to `frontend/.env` and configure for your environment.
+
+### Quick Setup
+
+```bash
+# Backend
+cp backend/.env.example backend/.env
+# Edit backend/.env with your MongoDB URI, JWT secrets, etc.
+
+# Frontend
+cp frontend/.env.example frontend/.env
+# Edit frontend/.env with your API URLs
 ```
 
-### Frontend
+### Deployment
 
-Copy `frontend/.env.example` to `frontend/.env`.
+**Render (Backend):** Copy values from `backend/.env` to Render environment variables
 
-```env
-VITE_API_URL=http://localhost:5000/api
-VITE_SOCKET_URL=http://localhost:5000
-```
+**Vercel (Frontend):** Copy `VITE_*` values from `frontend/.env` to Vercel environment variables
 
 ## Install
 
