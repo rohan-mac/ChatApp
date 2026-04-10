@@ -167,6 +167,20 @@ export const archiveChat = asyncHandler(async (req, res) => {
   res.json({ message: 'Chat archived successfully' });
 });
 
+export const clearChat = asyncHandler(async (req, res) => {
+  const { chatId } = req.validated.params;
+  const chat = await Chat.findOne({ _id: chatId, participants: req.user._id });
+  if (!chat) {
+    throw new AppError('Chat not found', 404);
+  }
+
+  await Message.updateMany(
+    { chatId, deletedForEveryone: false, deletedFor: { $ne: req.user._id } },
+    { $addToSet: { deletedFor: req.user._id } }
+  );
+  res.json({ message: 'Chat cleared successfully' });
+});
+
 export const unarchiveChat = asyncHandler(async (req, res) => {
   const { chatId } = req.validated.params;
   await Chat.findByIdAndUpdate(chatId, { $pull: { archivedBy: req.user._id } });

@@ -1,7 +1,7 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import EmojiPicker from 'emoji-picker-react';
-import { LoaderCircle, MoreVertical, Phone, Search, Video, X } from 'lucide-react';
+import { LoaderCircle, MoreVertical, Phone, Video, X } from 'lucide-react';
 import MessageBubble from '../MessageBubble';
 import InputBar from './InputBar';
 
@@ -32,53 +32,114 @@ const ChatWindow = ({
   attachment,
   setEditTarget,
   editTarget,
-  theme
+  theme,
+  onClearChat,
+  onSetTheme
 }) => {
-  const isOcean = theme === 'ocean';
-  const isRose = theme === 'rose';
-  const panelBackground = isDark
-    ? 'border-white/10 bg-[rgba(8,15,25,0.58)]'
-    : isOcean
-    ? 'border-cyan-200/20 bg-white/80'
-    : isRose
-    ? 'border-pink-200/20 bg-white/80'
-    : 'border-white/70 bg-[rgba(255,255,255,0.63)]';
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
 
   return (
-    <section className={`flex min-h-[78vh] flex-col rounded-[18px] border shadow-[0_10px_30px_rgba(0,0,0,0.12)] ${panelBackground}`}>
-    <header className={`flex items-center gap-3 border-b px-3 py-3 md:px-4 ${isDark ? 'border-white/10 bg-slate-950/80' : 'border-slate-200/80 bg-white/95'}`}>
-      <button
-        type="button"
-        onClick={onBack}
-        className={`inline-flex h-10 w-10 items-center justify-center rounded-full lg:hidden ${isDark ? 'bg-white/10 text-white' : 'bg-slate-900/5 text-slate-700'}`}
-      >
-        <X size={16} />
-      </button>
-
-      {selectedChat ? (
-        <>
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-[#25D366] text-sm font-semibold text-white shadow-sm">
-            {getChatName(selectedChat).charAt(0).toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold md:text-base text-slate-900 dark:text-white">{getChatName(selectedChat)}</p>
-            <p className={`truncate text-xs ${isDark ? 'text-slate-300/80' : 'text-slate-600'}`}>
-              {typingText || getChatStatus(selectedChat)}
-            </p>
-          </div>
-          <button type="button" className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${isDark ? 'bg-white/10 text-slate-200' : 'bg-slate-900/5 text-slate-600'}`}>
-            <Phone size={16} />
+    <section className="flex h-full flex-col bg-[#e5e5e5] shadow-[0_20px_60px_rgba(0,0,0,0.12)] rounded-none">
+      <header className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-4 shadow-sm rounded-none">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700 lg:hidden"
+          >
+            <X size={18} />
           </button>
-          <button type="button" className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${isDark ? 'bg-white/10 text-slate-200' : 'bg-slate-900/5 text-slate-600'}`}>
-            <Video size={16} />
-          </button>
-        </>
-      ) : (
-        <p className="text-sm font-medium">Select a conversation</p>
-      )}
-    </header>
+          {selectedChat ? (
+            <>
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-lg font-semibold text-white shadow-sm">
+                {getChatName(selectedChat).charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-base font-semibold text-slate-900">{getChatName(selectedChat)}</p>
+                <p className="truncate text-sm text-slate-500">{typingText || getChatStatus(selectedChat)}</p>
+              </div>
+            </>
+          ) : (
+            <p className="text-base font-medium text-slate-900">Select a conversation</p>
+          )}
+        </div>
 
-    <div className={`minimal-scrollbar flex-1 overflow-y-auto px-3 py-4 sm:px-4 ${isDark ? 'bg-slate-950/20' : 'bg-[#f0f2f5]'}`}>
+        {selectedChat ? (
+          <div className="relative flex items-center gap-2">
+            <button type="button" className="inline-flex h-11 w-11 items-center justify-center rounded-sm bg-slate-100 text-slate-700 hover:bg-slate-200">
+              <Phone size={18} />
+            </button>
+            <button type="button" className="inline-flex h-11 w-11 items-center justify-center rounded-sm bg-slate-100 text-slate-700 hover:bg-slate-200">
+              <Video size={18} />
+            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setOptionsOpen((current) => !current);
+                  setThemeMenuOpen(false);
+                }}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-sm bg-slate-100 text-slate-700 hover:bg-slate-200"
+              >
+                <MoreVertical size={18} />
+              </button>
+              {optionsOpen ? (
+                <div className="absolute right-0 top-full z-20 mt-2 w-44 overflow-hidden border border-slate-200 bg-white shadow-lg rounded-none">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOptionsOpen(false);
+                      onClearChat?.();
+                    }}
+                    className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-100"
+                  >
+                    <span>Clear chat</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setThemeMenuOpen((current) => !current)}
+                    className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-100"
+                  >
+                    <span>Set theme</span>
+                    <span className="text-slate-400">›</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOptionsOpen(false);
+                      onBack?.();
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-100"
+                  >
+                    Close chat
+                  </button>
+                </div>
+              ) : null}
+              {themeMenuOpen ? (
+                <div className="absolute right-full top-0 z-20 mr-2 mt-2 w-48 overflow-hidden border border-slate-200 bg-white shadow-lg rounded-none">
+                  {['light', 'dark', 'ocean', 'rose'].map((themeId) => (
+                    <button
+                      key={themeId}
+                      type="button"
+                      onClick={() => {
+                        onSetTheme?.(themeId);
+                        setThemeMenuOpen(false);
+                        setOptionsOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-100"
+                    >
+                      {themeId === 'light' ? 'Light' : themeId === 'dark' ? 'Dark' : themeId === 'ocean' ? 'Ocean' : 'Rose'}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+      </header>
+
+      <div className="minimal-scrollbar flex-1 overflow-y-auto bg-[#f0f2f5] px-4 py-4">
       {!selectedChat ? (
         <div className="flex h-full items-center justify-center text-sm opacity-70">Choose a chat to start messaging.</div>
       ) : loadingMessages ? (

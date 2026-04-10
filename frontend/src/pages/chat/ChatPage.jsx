@@ -60,6 +60,7 @@ const ChatPage = () => {
   const toggleStar = useChatStore((state) => state.toggleStar);
   const deleteMessage = useChatStore((state) => state.deleteMessage);
   const archiveSelectedChat = useChatStore((state) => state.archiveSelectedChat);
+  const clearChat = useChatStore((state) => state.clearChat);
   const handleIncomingMessage = useChatStore((state) => state.handleIncomingMessage);
   const handleUpdatedMessage = useChatStore((state) => state.handleUpdatedMessage);
   const handleDeletedMessage = useChatStore((state) => state.handleDeletedMessage);
@@ -213,6 +214,22 @@ const ChatPage = () => {
     }
   };
 
+  const handleClearChat = async () => {
+    if (!selectedChat?._id) return;
+
+    try {
+      await clearChat(selectedChat._id);
+      await openChat(selectedChat);
+      pushToast({ title: 'Chat cleared', tone: 'success' });
+    } catch (error) {
+      pushToast({
+        title: 'Unable to clear chat',
+        description: error.response?.data?.message || 'Please try again.',
+        tone: 'error'
+      });
+    }
+  };
+
   const handleNewChat = () => {
     setChatSearch('');
     setShowPeopleMode(true);
@@ -222,6 +239,7 @@ const ChatPage = () => {
   return (
     <AppShell
       showHeader={false}
+      showSidebar={false}
       theme={theme}
       themeOptions={themeOptions}
       onThemeSelect={setTheme}
@@ -237,7 +255,7 @@ const ChatPage = () => {
         </button>
       ) : null}
     >
-      <div className="grid gap-3 lg:grid-cols-[360px_minmax(0,1fr)]">
+      <div className="grid h-full gap-3 lg:grid-cols-[360px_minmax(0,1fr)]">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -291,6 +309,8 @@ const ChatPage = () => {
               }
             }}
             onBack={() => setShowConversations(true)}
+            onClearChat={handleClearChat}
+            onSetTheme={setTheme}
             endRef={endRef}
             draft={draft}
             setDraft={setDraft}

@@ -3,7 +3,7 @@ import { LogOut, Menu, MessageSquare, Moon, Settings, SunMedium, UserCircle2, X 
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const AppShell = ({ children, title, subtitle, theme, onToggleTheme, actions, showHeader = true, themeOptions = [], onThemeSelect }) => {
+const AppShell = ({ children, title, subtitle, theme, onToggleTheme, actions, showHeader = true, themeOptions = [], onThemeSelect, showSidebar = true }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -32,11 +32,12 @@ const AppShell = ({ children, title, subtitle, theme, onToggleTheme, actions, sh
       </div>
 
       <div className="relative mx-auto flex min-h-screen max-w-[1600px] gap-4 p-3 sm:p-5 lg:p-6">
-        <aside
-          className={`fixed inset-y-3 left-3 z-40 w-[88px] rounded-[32px] border p-3 shadow-2xl backdrop-blur-2xl transition md:static md:translate-x-0 ${
-            mobileOpen ? 'translate-x-0' : '-translate-x-[120%]'
-          } ${shellClasses}`}
-        >
+        {showSidebar ? (
+          <aside
+            className={`fixed inset-y-3 left-3 z-40 w-[88px] border p-3 shadow-2xl transition md:static md:translate-x-0 ${
+              mobileOpen ? 'translate-x-0' : '-translate-x-[120%]'
+            } ${shellClasses}`}
+          >
           <div className="mb-6 flex items-center justify-center rounded-[28px] border px-3 py-4 text-center text-xs uppercase tracking-[0.35em] opacity-70">
             ChatApp
           </div>
@@ -67,44 +68,19 @@ const AppShell = ({ children, title, subtitle, theme, onToggleTheme, actions, sh
           </nav>
 
           <div className="mt-auto flex flex-col gap-3 pt-6">
-            {themeOptions.length > 0 ? (
-              <div className="rounded-[28px] border border-white/10 bg-white/5 p-3">
-                <p className="mb-2 text-xs uppercase tracking-[0.35em] text-slate-400">Theme</p>
-                <div className="flex items-center gap-2">
-                  {themeOptions.map((option) => (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => onThemeSelect?.(option.id)}
-                      className={`h-10 w-10 rounded-full border-2 transition ${
-                        theme === option.id ? 'border-white' : 'border-white/10'
-                      } ${option.id === 'dark' ? 'bg-slate-900' : option.id === 'ocean' ? 'bg-cyan-500' : 'bg-fuchsia-500'}`}
-                      title={option.label}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : null}
-            <button
-              type="button"
-              title={isDark ? 'Light mode' : 'Dark mode'}
-              onClick={onToggleTheme}
-              className={`inline-flex h-14 w-full items-center justify-center rounded-3xl border ${panelClasses} ${iconClasses}`}
-            >
-              {isDark ? <SunMedium size={18} /> : <Moon size={18} />}
-            </button>
             <button
               type="button"
               title="Logout"
               onClick={logout}
-              className={`inline-flex h-14 w-full items-center justify-center rounded-3xl border ${panelClasses} ${iconClasses}`}
+              className={`inline-flex h-14 w-full items-center justify-center border ${panelClasses} ${iconClasses}`}
             >
               <LogOut size={18} />
             </button>
           </div>
         </aside>
+        ) : null}
 
-        {mobileOpen ? (
+        {showSidebar && mobileOpen ? (
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
@@ -113,7 +89,7 @@ const AppShell = ({ children, title, subtitle, theme, onToggleTheme, actions, sh
           />
         ) : null}
 
-        <section className={`relative z-10 min-h-[calc(100vh-1.5rem)] flex-1 rounded-[32px] border shadow-2xl backdrop-blur-2xl ${shellClasses}`}>
+        <section className={`relative z-10 min-h-[calc(100vh-1.5rem)] flex-1 ${shellClasses}`}>
           {showHeader ? (
             <header className={`flex items-center justify-between gap-4 border-b px-4 py-4 sm:px-6 ${isDark ? 'border-white/10' : 'border-white/60'}`}>
               <div className="flex items-center gap-3">
@@ -133,7 +109,7 @@ const AppShell = ({ children, title, subtitle, theme, onToggleTheme, actions, sh
             </header>
           ) : null}
 
-          <div className="p-4 sm:p-6">{children}</div>
+          <div className="h-full p-4 sm:p-6">{children}</div>
         </section>
       </div>
     </div>

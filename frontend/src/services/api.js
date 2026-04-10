@@ -1,13 +1,6 @@
 import axios from 'axios';
 
 const getDefaultBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://localhost:5000';
-    }
-  }
-
   return 'https://chatapp-pjh9.onrender.com';
 };
 

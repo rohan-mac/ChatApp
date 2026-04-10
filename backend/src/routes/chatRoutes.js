@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   archiveChat,
+  clearChat,
   createGroupChat,
   createOrGetChat,
   getChatMessagesPreview,
@@ -28,6 +29,7 @@ router.patch('/group/:chatId', verifyToken, validateRequest(updateGroupSchema), 
 router.get('/:chatId/preview', verifyToken, validateRequest(chatActionSchema), getChatMessagesPreview);
 router.post('/:chatId/pin', verifyToken, validateRequest(chatActionSchema), pinChat);
 router.post('/:chatId/archive', verifyToken, validateRequest(chatActionSchema), archiveChat);
+router.post('/:chatId/clear', verifyToken, validateRequest(chatActionSchema), clearChat);
 router.delete('/:chatId/archive', verifyToken, validateRequest(chatActionSchema), unarchiveChat);
 
 export default router;

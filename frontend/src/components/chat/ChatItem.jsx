@@ -37,38 +37,34 @@ const ChatItem = ({ chat, active, onOpen, name, preview, isDark, theme }) => {
     <button
       type="button"
       onClick={() => onOpen(chat)}
-      className={`group w-full rounded-[18px] border p-3 text-left transition-all duration-300 ease-in-out hover:scale-[1.01] hover:brightness-105 ${
+      className={`group flex w-full items-start gap-3 rounded-none border px-4 py-3 text-left transition ${
         active
-          ? activeAccent
-          : isDark
-            ? 'border-white/10 bg-slate-900/80 hover:bg-slate-900/90'
-            : 'border-slate-200 bg-white shadow-sm hover:bg-slate-50'
+          ? 'border-[#0084ff] bg-[#e8f0ff] shadow-sm'
+          : 'border-transparent bg-white hover:border-slate-200 hover:bg-slate-50'
       }`}
     >
-      <div className="flex items-center gap-3">
-        <div className="relative shrink-0">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br ${accent} text-sm font-semibold text-white shadow-lg`}>
-            {getInitials(name)}
-          </div>
-          {chat.counterpart?.isOnline ? (
-            <span className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 ${isDark ? 'border-[#07131c]' : 'border-white'} ${badgeColor}`} />
-          ) : null}
+      <div className="relative shrink-0">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0084ff] text-lg font-semibold text-white shadow-sm">
+          {getInitials(name)}
         </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-900 dark:text-white">{name}</p>
-            {time ? <span className={`shrink-0 text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{time}</span> : null}
-          </div>
-          <p className={`mt-1 truncate text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{preview}</p>
-        </div>
-
-        {badge > 0 ? (
-          <span className="ml-2 inline-flex min-w-6 items-center justify-center rounded-full bg-[#0084ff] px-2 py-1 text-[11px] font-semibold text-white shadow-sm">
-            {badge}
-          </span>
+        {chat.counterpart?.isOnline ? (
+          <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
         ) : null}
       </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-3">
+          <p className="truncate text-sm font-semibold text-slate-900">{name}</p>
+          {time ? <span className="shrink-0 text-xs text-slate-500">{time}</span> : null}
+        </div>
+        <p className="mt-1 truncate text-sm text-slate-500">{preview}</p>
+      </div>
+
+      {badge > 0 ? (
+        <span className="inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-[#0084ff] px-2 py-1 text-xs font-semibold text-white">
+          {badge}
+        </span>
+      ) : null}
     </button>
   );
 };

@@ -122,6 +122,15 @@ export const useChatStore = create((set, get) => ({
     await get().loadChats();
   },
 
+  clearChat: async (chatId) => {
+    if (!chatId) return;
+    await api.post(`/chats/${chatId}/clear`);
+    if (get().selectedChat?._id === chatId) {
+      set({ messages: [] });
+    }
+    await get().loadChats();
+  },
+
   searchMessages: async (query) => {
     if (!query.trim()) {
       set({ messageSearchResults: [] });
