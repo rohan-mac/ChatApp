@@ -12,10 +12,32 @@ const bootstrap = async () => {
   await connectDB();
 
   const server = http.createServer(app);
+
+  // ============================================================================
+  // Socket.IO CORS Configuration - MUST match HTTP CORS
+  // ============================================================================
   const io = new Server(server, {
     cors: {
-      origin: env.CORS_ORIGINS,
-      credentials: true
+      // Strict origin validation for Socket.IO (same as Express CORS)
+      origin: (origin, callback) => {
+        // Allow requests with no origin
+        if (!origin) {
+          return callback(null, true);
+        }
+
+        // Check if origin is whitelisted
+        if (env.CORS_ORIGINS.includes(origin)) {
+          callback(null, true);
+        } else {
+          logger.warn('Socket.IO CORS request blocked', {
+            origin,
+            allowedOrigins: env.CORS_ORIGINS
+          });
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+      methods: ['GET', 'POST']
     }
   });
 
@@ -26,9 +48,16 @@ const bootstrap = async () => {
   configureSocket(io);
 
   server.listen(env.PORT, () => {
-    logger.info('HTTP server started', { port: env.PORT, env: env.NODE_ENV });
+    logger.info('HTTP server started', {
+      port: env.PORT,
+      env: env.NODE_ENV,
+      corsOrigins: env.CORS_ORIGINS
+    });
   });
 
+  // ============================================================================
+  // Graceful Shutdown Handler
+  // ============================================================================
   const shutdown = async (signal) => {
     logger.info('Graceful shutdown requested', { signal });
     server.close(async () => {

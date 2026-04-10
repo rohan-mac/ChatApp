@@ -26,9 +26,31 @@ if (!parsed.success) {
   throw new Error(`Invalid environment configuration: ${parsed.error.issues.map((issue) => issue.message).join(', ')}`);
 }
 
+// Build CORS origins list
+const buildCorsOrigins = () => {
+  const origins = new Set();
+
+  // Always allow localhost for development
+  origins.add('http://localhost:5173');
+  origins.add('http://localhost:5174');
+  origins.add('http://localhost:3000');
+
+  // Add configured client URL
+  if (parsed.data.CLIENT_URL) {
+    origins.add(parsed.data.CLIENT_URL);
+  }
+
+  // Add additional URLs from CLIENT_URLS env var
+  if (parsed.data.CLIENT_URLS) {
+    parsed.data.CLIENT_URLS.split(',').forEach((url) => {
+      origins.add(url.trim());
+    });
+  }
+
+  return Array.from(origins);
+};
+
 export const env = {
   ...parsed.data,
-  CORS_ORIGINS: parsed.data.CLIENT_URLS
-    ? parsed.data.CLIENT_URLS.split(',').map((origin) => origin.trim())
-    : [parsed.data.CLIENT_URL]
+  CORS_ORIGINS: buildCorsOrigins()
 };
