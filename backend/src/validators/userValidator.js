@@ -42,7 +42,17 @@ export const updateProfileSchema = z.object({
 export const updatePreferencesSchema = z.object({
   body: z.object({
     themePreference: z.enum(['light', 'dark']).optional(),
-    notificationsEnabled: z.boolean().optional()
+    notificationsEnabled: z.boolean().optional(),
+    readReceiptsEnabled: z.boolean().optional()
+  }),
+  query: passthroughObject,
+  params: passthroughObject
+});
+
+export const changePasswordSchema = z.object({
+  body: z.object({
+    currentPassword: z.string().min(6),
+    newPassword: z.string().min(6)
   }),
   query: passthroughObject,
   params: passthroughObject

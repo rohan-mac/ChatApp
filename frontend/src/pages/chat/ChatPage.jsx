@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useSocket } from '../../hooks/useSocket';
 import useThemeMode from '../../hooks/useThemeMode';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useChatStore } from '../../store/chatStore';
 
 const chatName = (chat) => chat?.counterpart?.name || chat?.title || 'Conversation';
@@ -27,6 +28,7 @@ const ChatPage = () => {
   const { pushToast } = useToast();
   const [theme, setTheme] = useThemeMode();
   const isDark = theme === 'dark';
+  const isLargeScreen = useMediaQuery('lg');
 
   const [chatSearch, setChatSearch] = useState('');
   const [draft, setDraft] = useState('');
@@ -120,14 +122,14 @@ const ChatPage = () => {
   useEffect(() => {
     if (!selectedChat?._id) {
       setShowConversations(true);
-    } else if (window.innerWidth < 1024) {
+    } else if (!isLargeScreen) {
       setShowConversations(false);
     }
-  }, [selectedChat?._id]);
+  }, [selectedChat?._id, isLargeScreen]);
 
   const handleOpenChat = async (chat) => {
     await openChat(chat);
-    if (window.innerWidth < 1024) {
+    if (!isLargeScreen) {
       setShowConversations(false);
     }
   };
@@ -264,7 +266,7 @@ const ChatPage = () => {
   return (
     <AppShell
       showHeader={false}
-      showSidebar={false}
+      showSidebar={true}
       theme={theme}
       themeOptions={themeOptions}
       onThemeSelect={setTheme}
@@ -280,11 +282,11 @@ const ChatPage = () => {
         </button>
       ) : null}
     >
-      <div className="grid h-full gap-3 lg:grid-cols-[360px_minmax(0,1fr)]">
+      <div className="grid w-full h-full min-h-[500px] gap-3 auto-rows-max lg:auto-rows-fr lg:grid-cols-[360px_minmax(0,1fr)] overflow-hidden">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          className={showConversations ? 'block' : 'hidden lg:block'}
+          className={`min-h-0 ${showConversations ? 'block' : 'hidden lg:block'}`}
         >
           <ChatList
             chats={filteredChats}
@@ -307,7 +309,7 @@ const ChatPage = () => {
           />
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={showConversations ? 'hidden lg:block' : 'block'}>
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={`min-h-0 ${showConversations ? 'hidden lg:flex' : 'flex'} flex-col`}>
           <ChatWindow
             isDark={isDark}
             selectedChat={selectedChat}

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import {
   blockUser,
+  changePassword,
   deleteUser,
   getProfile,
   getUsers,
@@ -16,6 +17,7 @@ import { isAdmin, verifyToken } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middleware/validateRequest.js';
 import {
   blockUserSchema,
+  changePasswordSchema,
   registerPushTokenSchema,
   searchUsersSchema,
   updatePreferencesSchema,
@@ -32,6 +34,7 @@ router.get('/', verifyToken, validateRequest(searchUsersSchema), getUsers);
 router.get('/me', verifyToken, getProfile);
 router.patch('/me', verifyToken, upload.single('avatar'), validateRequest(updateProfileSchema), updateProfile);
 router.patch('/preferences', verifyToken, validateRequest(updatePreferencesSchema), updatePreferences);
+router.patch('/change-password', verifyToken, validateRequest(changePasswordSchema), changePassword);
 router.post('/push-token', verifyToken, validateRequest(registerPushTokenSchema), registerPushToken);
 router.post('/block/:id', verifyToken, validateRequest(blockUserSchema), blockUser);
 router.post('/unblock/:id', verifyToken, validateRequest(blockUserSchema), unblockUser);

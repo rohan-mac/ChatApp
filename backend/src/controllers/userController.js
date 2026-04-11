@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { AppError } from '../lib/appError.js';
 import { User } from '../models/User.js';
@@ -59,6 +60,25 @@ export const updatePreferences = asyncHandler(async (req, res) => {
   ).select('-passwordHash');
 
   res.json({ message: 'Preferences updated successfully', user });
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.validated.body;
+
+  const user = await User.findById(req.user._id).select('+passwordHash');
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  const matches = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!matches) {
+    throw new AppError('Current password is incorrect', 400);
+  }
+
+  const newPasswordHash = await bcrypt.hash(newPassword, 12);
+  await User.findByIdAndUpdate(req.user._id, { passwordHash: newPasswordHash });
+
+  res.json({ message: 'Password changed successfully' });
 });
 
 export const blockUser = asyncHandler(async (req, res) => {

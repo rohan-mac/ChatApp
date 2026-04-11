@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Camera, Save, Sparkles } from 'lucide-react';
+import { Camera, Save, Sparkles, Lock } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -15,6 +15,11 @@ const ProfilePage = () => {
     bio: user?.bio || '',
     status: user?.status || ''
   });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
   const [avatar, setAvatar] = useState(null);
 
   const saveProfile = async (event) => {
@@ -28,6 +33,21 @@ const ProfilePage = () => {
     const { data } = await api.patch('/users/me', payload);
     setUser(data.user);
     pushToast({ title: 'Profile updated', tone: 'success' });
+  };
+
+  const changePassword = async (event) => {
+    event.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      pushToast({ title: 'Passwords do not match', tone: 'error' });
+      return;
+    }
+
+    await api.patch('/users/change-password', {
+      currentPassword: passwordForm.currentPassword,
+      newPassword: passwordForm.newPassword
+    });
+    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    pushToast({ title: 'Password changed', tone: 'success' });
   };
 
   return (
@@ -112,6 +132,55 @@ const ProfilePage = () => {
             </div>
           </div>
         </aside>
+      </form>
+
+      <form onSubmit={changePassword} className="mt-8">
+        <section className={`rounded-[30px] border p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/82'}`}>
+          <div className={`mb-5 rounded-[24px] border p-4 ${theme === 'dark' ? 'border-white/10 bg-white/6' : 'border-white/80 bg-white/80'}`}>
+            <p className="text-xs uppercase tracking-[0.35em] opacity-60">Security</p>
+            <h3 className="mt-3 text-2xl font-semibold">Change Password</h3>
+            <p className="mt-2 text-sm leading-6 opacity-70">
+              Update your password to keep your account secure.
+            </p>
+          </div>
+
+          <div className="grid gap-4">
+            <label className="grid gap-2 text-sm">
+              <span>Current Password</span>
+              <input
+                type="password"
+                value={passwordForm.currentPassword}
+                onChange={(event) => setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))}
+                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
+              />
+            </label>
+
+            <label className="grid gap-2 text-sm">
+              <span>New Password</span>
+              <input
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={(event) => setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))}
+                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
+              />
+            </label>
+
+            <label className="grid gap-2 text-sm">
+              <span>Confirm New Password</span>
+              <input
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={(event) => setPasswordForm((current) => ({ ...current, confirmPassword: event.target.value }))}
+                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
+              />
+            </label>
+          </div>
+
+          <button type="submit" className="mt-6 inline-flex items-center gap-2 rounded-[22px] bg-gradient-to-r from-emerald-500 to-green-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(16,185,129,0.26)]">
+            <Lock size={16} />
+            <span>Change password</span>
+          </button>
+        </section>
       </form>
     </AppShell>
   );

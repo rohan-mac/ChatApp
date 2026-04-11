@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, MoonStar, Save } from 'lucide-react';
+import { Bell, MoonStar, Save, Shield } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -11,11 +11,13 @@ const SettingsPage = () => {
   const { pushToast } = useToast();
   const [theme, setTheme] = useThemeMode();
   const [notificationsEnabled, setNotificationsEnabled] = useState(Boolean(user?.notificationsEnabled));
+  const [readReceiptsEnabled, setReadReceiptsEnabled] = useState(Boolean(user?.readReceiptsEnabled));
 
   const saveSettings = async () => {
     const { data } = await api.patch('/users/preferences', {
       themePreference: theme,
-      notificationsEnabled
+      notificationsEnabled,
+      readReceiptsEnabled
     });
     setUser(data.user);
     pushToast({ title: 'Settings saved', tone: 'success' });
@@ -73,11 +75,30 @@ const SettingsPage = () => {
             <span>Push notifications</span>
             <input type="checkbox" checked={notificationsEnabled} onChange={(event) => setNotificationsEnabled(event.target.checked)} />
           </label>
-          <button type="button" onClick={saveSettings} className="mt-6 inline-flex items-center gap-2 rounded-[22px] bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(59,130,246,0.26)]">
+        </section>
+
+        <section className={`rounded-[30px] border p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/82'}`}>
+          <div className="flex items-center gap-3">
+            <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-green-500 p-3 text-white">
+              <Shield size={18} />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Privacy</h3>
+              <p className="mt-1 text-sm opacity-70">Control your visibility and message read receipts.</p>
+            </div>
+          </div>
+          <label className="mt-5 flex items-center justify-between rounded-2xl border px-4 py-4 text-sm">
+            <span>Read receipts</span>
+            <input type="checkbox" checked={readReceiptsEnabled} onChange={(event) => setReadReceiptsEnabled(event.target.checked)} />
+          </label>
+        </section>
+
+        <div className="col-span-2 flex justify-center">
+          <button type="button" onClick={saveSettings} className="inline-flex items-center gap-2 rounded-[22px] bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(59,130,246,0.26)]">
             <Save size={16} />
             <span>Save settings</span>
           </button>
-        </section>
+        </div>
       </div>
     </AppShell>
   );
