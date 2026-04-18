@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Camera, Save, Sparkles, Lock } from 'lucide-react';
+import { Camera, Lock, Save } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -23,22 +23,30 @@ const ProfilePage = () => {
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
+  const panelClass = theme === 'dark'
+    ? 'border-white/10 bg-white/5'
+    : 'border-white/70 bg-white/85';
+  const fieldClass = theme === 'dark'
+    ? 'border-white/10 bg-white/5 text-white placeholder:text-slate-400'
+    : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-500';
+
   const handleAvatarChange = (event) => {
     const file = event.target.files?.[0] || null;
     setAvatar(file);
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => setAvatarPreview(e.target.result);
-      reader.readAsDataURL(file);
-    } else {
+
+    if (!file) {
       setAvatarPreview(null);
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = (e) => setAvatarPreview(e.target.result);
+    reader.readAsDataURL(file);
   };
 
   const saveProfile = async (event) => {
     event.preventDefault();
 
-    // Validate form
     if (!form.name || form.name.trim().length < 2) {
       pushToast({ title: 'Name must be at least 2 characters', tone: 'error' });
       return;
@@ -55,9 +63,8 @@ const ProfilePage = () => {
       setUser(data.user);
       setAvatar(null);
       setAvatarPreview(null);
-      pushToast({ title: 'Profile updated successfully', tone: 'success' });
+      pushToast({ title: 'Profile updated', tone: 'success' });
     } catch (error) {
-      console.error('Profile update error:', error);
       pushToast({
         title: 'Failed to update profile',
         description: error.response?.data?.message || error.message,
@@ -68,6 +75,7 @@ const ProfilePage = () => {
 
   const changePassword = async (event) => {
     event.preventDefault();
+
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       pushToast({ title: 'Passwords do not match', tone: 'error' });
       return;
@@ -84,9 +92,8 @@ const ProfilePage = () => {
         newPassword: passwordForm.newPassword
       });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      pushToast({ title: 'Password changed successfully', tone: 'success' });
+      pushToast({ title: 'Password changed', tone: 'success' });
     } catch (error) {
-      console.error('Password change error:', error);
       pushToast({
         title: 'Failed to change password',
         description: error.response?.data?.message || error.message,
@@ -98,152 +105,132 @@ const ProfilePage = () => {
   return (
     <AppShell
       title="Profile"
-      subtitle="Update your public identity, avatar and status."
+      subtitle="Edit your details"
       theme={theme}
       onToggleTheme={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+      showMobileBottomNav={false}
     >
-      <form onSubmit={saveProfile} className="grid gap-4 lg:grid-cols-[1fr_340px]">
-        <section className={`rounded-[30px] border p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/82'}`}>
-          <div className={`mb-5 rounded-[24px] border p-4 ${theme === 'dark' ? 'border-white/10 bg-white/6' : 'border-white/80 bg-white/80'}`}>
-            <p className="text-xs uppercase tracking-[0.35em] opacity-60">Identity</p>
-            <h3 className="mt-3 text-2xl font-semibold">Design your visible presence</h3>
-            <p className="mt-2 text-sm leading-6 opacity-70">
-              Update your name, public status and bio to personalize the premium messaging experience.
-            </p>
-          </div>
-
-          <div className="grid gap-4">
-            <label className="grid gap-2 text-sm">
-              <span>Name</span>
-              <input
-                value={form.name}
-                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
-              />
-            </label>
-
-            <label className="grid gap-2 text-sm">
-              <span>Status</span>
-              <input
-                value={form.status}
-                onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
-                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
-              />
-            </label>
-
-            <label className="grid gap-2 text-sm">
-              <span>Bio</span>
-              <textarea
-                rows="5"
-                value={form.bio}
-                onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
-                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
-              />
-            </label>
-          </div>
-        </section>
-
-        <aside className={`rounded-[30px] border p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/82'}`}>
-          <div className="flex flex-col items-center text-center">
-            {avatarPreview ? (
-              <div className="relative">
-                <img src={avatarPreview} alt="Preview" className="h-28 w-28 rounded-full object-cover shadow-lg ring-2 ring-sky-500" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAvatar(null);
-                    setAvatarPreview(null);
-                  }}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold hover:bg-red-600 transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            ) : user?.profilePic ? (
-              <img src={user.profilePic} alt={user.name} className="h-28 w-28 rounded-full object-cover" />
-            ) : (
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-3xl font-semibold text-white">
-                {user?.name?.[0]?.toUpperCase() || '?'}
-              </div>
-            )}
-            <p className="mt-4 text-lg font-semibold">{user?.name}</p>
-            <p className="text-sm opacity-70">{user?.email}</p>
-            <label className={`mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[22px] border px-4 py-3 text-sm ${
-              theme === 'dark' ? 'border-white/10 bg-white/6 hover:bg-white/10' : 'border-white/80 bg-white/85 hover:bg-white/95'
-            } transition-colors`}>
-              <Camera size={16} />
-              <span>{avatar ? avatar.name : 'Choose avatar'}</span>
-              <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-            </label>
-            <button type="submit" className="mt-6 inline-flex items-center gap-2 rounded-[22px] bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(59,130,246,0.26)]">
-              <Save size={16} />
-              <span>Save profile</span>
-            </button>
-            <div className={`mt-5 w-full rounded-[22px] border p-4 text-left text-sm ${
-              theme === 'dark' ? 'border-white/10 bg-white/6' : 'border-white/80 bg-white/80'
-            }`}>
-              <div className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] opacity-60">
-                <Sparkles size={14} />
-                Quick Preview
-              </div>
-              <p className="mt-3 font-semibold">{form.name || 'Your name'}</p>
-              <p className="mt-1 opacity-70">{form.status || 'Available'}</p>
+      <div className="minimal-scrollbar flex-1 overflow-y-auto px-3 py-3 sm:px-4 md:px-6">
+        <form onSubmit={saveProfile} className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <section className={`rounded-3xl border p-4 sm:p-6 ${panelClass}`}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold sm:text-xl">Profile details</h3>
             </div>
-          </div>
-        </aside>
-      </form>
 
-      <form onSubmit={changePassword} className="mt-8">
-        <section className={`rounded-[30px] border p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/82'}`}>
-          <div className={`mb-5 rounded-[24px] border p-4 ${theme === 'dark' ? 'border-white/10 bg-white/6' : 'border-white/80 bg-white/80'}`}>
-            <p className="text-xs uppercase tracking-[0.35em] opacity-60">Security</p>
-            <h3 className="mt-3 text-2xl font-semibold">Change Password</h3>
-            <p className="mt-2 text-sm leading-6 opacity-70">
-              Update your password to keep your account secure.
-            </p>
-          </div>
+            <div className="grid gap-4">
+              <label className="grid gap-2 text-sm">
+                <span>Name</span>
+                <input
+                  value={form.name}
+                  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                  className={`rounded-2xl border px-4 py-3 outline-none ${fieldClass}`}
+                />
+              </label>
 
-          <div className="grid gap-4">
-            <label className="grid gap-2 text-sm">
-              <span>Current Password</span>
-              <input
-                type="password"
-                autoComplete="current-password"
-                value={passwordForm.currentPassword}
-                onChange={(event) => setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))}
-                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
-              />
-            </label>
+              <label className="grid gap-2 text-sm">
+                <span>Status</span>
+                <input
+                  value={form.status}
+                  onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
+                  className={`rounded-2xl border px-4 py-3 outline-none ${fieldClass}`}
+                />
+              </label>
 
-            <label className="grid gap-2 text-sm">
-              <span>New Password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={passwordForm.newPassword}
-                onChange={(event) => setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))}
-                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
-              />
-            </label>
+              <label className="grid gap-2 text-sm">
+                <span>Bio</span>
+                <textarea
+                  rows="4"
+                  value={form.bio}
+                  onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
+                  className={`rounded-2xl border px-4 py-3 outline-none ${fieldClass}`}
+                />
+              </label>
+            </div>
+          </section>
 
-            <label className="grid gap-2 text-sm">
-              <span>Confirm New Password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={passwordForm.confirmPassword}
-                onChange={(event) => setPasswordForm((current) => ({ ...current, confirmPassword: event.target.value }))}
-                className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
-              />
-            </label>
-          </div>
+          <aside className={`rounded-3xl border p-4 sm:p-6 ${panelClass}`}>
+            <div className="flex flex-col items-center text-center">
+              {avatarPreview ? (
+                <img src={avatarPreview} alt="Preview" className="h-24 w-24 rounded-full object-cover sm:h-28 sm:w-28" />
+              ) : user?.profilePic ? (
+                <img src={user.profilePic} alt={user.name} className="h-24 w-24 rounded-full object-cover sm:h-28 sm:w-28" />
+              ) : (
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-3xl font-semibold text-white sm:h-28 sm:w-28">
+                  {user?.name?.[0]?.toUpperCase() || '?'}
+                </div>
+              )}
 
-          <button type="submit" className="mt-6 inline-flex items-center gap-2 rounded-[22px] bg-gradient-to-r from-emerald-500 to-green-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(16,185,129,0.26)]">
-            <Lock size={16} />
-            <span>Change password</span>
-          </button>
-        </section>
-      </form>
+              <p className="mt-4 text-base font-semibold sm:text-lg">{user?.name}</p>
+              <p className="text-sm opacity-70 break-all">{user?.email}</p>
+
+              <label className={`mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm transition-colors ${panelClass}`}>
+                <Camera size={16} />
+                <span>{avatar ? avatar.name : 'Change avatar'}</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+              </label>
+
+              <button
+                type="submit"
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white"
+              >
+                <Save size={16} />
+                <span>Save profile</span>
+              </button>
+            </div>
+          </aside>
+        </form>
+
+        <form onSubmit={changePassword} className="mt-4">
+          <section className={`rounded-3xl border p-4 sm:p-6 ${panelClass}`}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold sm:text-xl">Password</h3>
+            </div>
+
+            <div className="grid gap-4">
+              <label className="grid gap-2 text-sm">
+                <span>Current password</span>
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  value={passwordForm.currentPassword}
+                  onChange={(event) => setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))}
+                  className={`rounded-2xl border px-4 py-3 outline-none ${fieldClass}`}
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm">
+                <span>New password</span>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={passwordForm.newPassword}
+                  onChange={(event) => setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))}
+                  className={`rounded-2xl border px-4 py-3 outline-none ${fieldClass}`}
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm">
+                <span>Confirm password</span>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(event) => setPasswordForm((current) => ({ ...current, confirmPassword: event.target.value }))}
+                  className={`rounded-2xl border px-4 py-3 outline-none ${fieldClass}`}
+                />
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-500 px-5 py-3 text-sm font-semibold text-white"
+            >
+              <Lock size={16} />
+              <span>Change password</span>
+            </button>
+          </section>
+        </form>
+      </div>
     </AppShell>
   );
 };

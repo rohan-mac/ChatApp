@@ -122,9 +122,17 @@ const ChatItem = ({ chat, active, onOpen, name, preview, isDark, theme }) => {
     >
       {/* Avatar */}
       <div className="relative shrink-0">
-        <div className="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-sm sm:text-lg font-bold text-white shadow-lg">
-          {getInitials(name)}
-        </div>
+        {chat.counterpart?.profilePic ? (
+          <img
+            src={chat.counterpart.profilePic}
+            alt={name}
+            className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl object-cover shadow-lg ring-2 ring-white/50"
+          />
+        ) : (
+          <div className="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-sm sm:text-lg font-bold text-white shadow-lg">
+            {getInitials(name)}
+          </div>
+        )}
         {chat.counterpart?.isOnline ? (
           <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 sm:h-4 sm:w-4 rounded-full border-2 border-white bg-emerald-500 shadow-sm"></span>
         ) : null}

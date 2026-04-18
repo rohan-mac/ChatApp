@@ -75,7 +75,7 @@ const ChatWindow = ({
 
   return (
     <section
-      className={`relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl md:rounded-3xl shadow-xl ${
+      className={`relative flex h-full min-h-0 flex-col overflow-hidden rounded-none md:rounded-3xl shadow-xl bg-[var(--bg-surface)] ${
         isDark
           ? 'bg-slate-950/95'
           : isOcean
@@ -98,9 +98,17 @@ const ChatWindow = ({
 
           {selectedChat ? (
             <>
-              <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-blue-500 text-white font-bold">
-                {getChatName(selectedChat).charAt(0).toUpperCase()}
-              </div>
+              {selectedChat?.counterpart?.profilePic ? (
+                <img
+                  src={selectedChat.counterpart.profilePic}
+                  alt={getChatName(selectedChat)}
+                  className="h-10 w-10 flex items-center justify-center rounded-xl object-cover bg-blue-500"
+                />
+              ) : (
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold text-lg">
+                  {getChatName(selectedChat)[0]?.toUpperCase() || '?'}
+                </div>
+              )}
               <div className="truncate">
                 <p className="font-semibold">{getChatName(selectedChat)}</p>
                 <p className="text-xs text-gray-500">
@@ -117,9 +125,21 @@ const ChatWindow = ({
           <div className="flex items-center gap-2">
             <Phone />
             <Video />
-            <button onClick={() => setOptionsOpen(!optionsOpen)}>
-              <MoreVertical />
-            </button>
+            <div className="relative">
+              <button onClick={() => setOptionsOpen(!optionsOpen)} className="p-1.5 rounded-full hover:bg-[var(--accent)]/10">
+                <MoreVertical size={18} />
+              </button>
+              {optionsOpen && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-2xl py-1 z-50 flex flex-col">
+                  <button className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1" onClick={() => pushToast({title: 'View Contact', description: 'Profile page coming soon', tone: 'info'})}>View Contact</button>
+                  <button className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1" onClick={() => pushToast({title: 'Media', description: 'Media gallery coming soon', tone: 'info'})}>Media, links & docs</button>
+                  <button className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1" onClick={() => pushToast({title: 'Search', description: 'Search in chat coming soon', tone: 'info'})}>Search Chat</button>
+                  <div className="h-px bg-[var(--border)] my-1"></div>
+<button onClick={onClearChat} className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1">Clear Chat</button>
+                  <button className="px-4 py-2 text-sm hover:bg-red-500/10 text-red-500 rounded-lg mx-1 border-t border-[var(--border)] mt-1" onClick={() => pushToast({title: 'Delete Chat', description: 'Delete chat coming soon', tone: 'error'})}>Delete Chat</button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </header>

@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+  import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Archive } from 'lucide-react';
 import AppShell from '../../components/AppShell';
@@ -348,7 +348,9 @@ const ChatPage = () => {
             }}
             onBack={() => setShowConversations(true)}
             onClearChat={handleClearChat}
+            pushToast={pushToast}
             onSetTheme={setChatTheme}
+            // onSetTheme={setChatTheme}
             endRef={endRef}
             draft={draft}
             setDraft={setDraft}

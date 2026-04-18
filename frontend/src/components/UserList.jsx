@@ -107,9 +107,17 @@ const UserList = ({ users, onSelect, selectedId, theme, palette }) => (
         >
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="relative shrink-0">
-              <div className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gradient-to-br ${palette.accent} text-xs sm:text-sm font-semibold text-white`}>
-                {getInitials(user.name)}
-              </div>
+              {user.profilePic ? (
+                <img
+                  src={user.profilePic}
+                  alt={user.name}
+                  className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover ring-2 ring-white/50"
+                />
+              ) : (
+                <div className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gradient-to-br ${palette.accent} text-xs sm:text-sm font-semibold text-white`}>
+                  {getInitials(user.name)}
+                </div>
+              )}
               <span
                 className={`absolute bottom-0 right-0 h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-full border-2 ${
                   theme === 'dark' ? 'border-[#09101d]' : 'border-white'

@@ -232,7 +232,7 @@ const AppShell = ({
       </div>
 
       {/* MAIN LAYOUT */}
-      <div className="relative flex h-full w-full flex-col md:flex-row gap-2 md:gap-4 p-2 sm:p-3 md:p-5 lg:p-6">
+      <div className="relative flex h-full w-full flex-col md:flex-row gap-2 md:gap-4  sm:p-3 md:p-5 lg:p-6">
 
         {/* SIDEBAR */}
         {showSidebar && (
@@ -331,7 +331,7 @@ const AppShell = ({
 
                       {expandTheme && (
                         <div className="ml-2 flex flex-col gap-1">
-                          {['dark', 'ocean', 'rose'].map((t) => (
+{themeOptions.map((t) => (
                             <button
                               key={t}
                               onClick={() => {
@@ -340,11 +340,11 @@ const AppShell = ({
                               }}
                               className={`px-3 py-1 rounded text-sm text-left ${
                                 theme === t
-                                  ? 'bg-yellow-200 dark:bg-yellow-500/20'
-                                  : ''
+                                  ? 'bg-[var(--accent)]/10'
+                                  : 'hover:bg-slate-100 dark:hover:bg-white/10'
                               }`}
                             >
-                              {t}
+                              {t.charAt(0).toUpperCase() + t.slice(1)}
                             </button>
                           ))}
                         </div>

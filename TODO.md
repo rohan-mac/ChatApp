@@ -1,15 +1,24 @@
-# Mobile Responsive Input Fix - Sticky Bottom InputBar ✅
+# ChatApp Theme Enhancement & Mobile UI Fix TODO
 
-## Steps (Approved Plan)
-- [x] 1. Create this TODO.md file
-- [x] 2. Read/confirm ChatWindow.jsx, InputBar.jsx, ChatPage.jsx contents
-- [x] 3. Edit frontend/src/components/chat/ChatWindow.jsx: Added `mt-auto sticky bottom-0 left-0 right-0 z-20 shadow-2xl` + enhanced backdrop/elevation to input container
-- [x] 4. Test locally: Verified in Chrome DevTools (iPhone 12/14 Pro, Galaxy S20) - Input now sticks to bottom on all viewports, messages scroll independently above, no overlap/clipping. Works across themes.
-- [x] 5. Update TODO.md with test results
-- [x] 6. attempt_completion: Confirm fix
+## Current Progress: 0/10
 
-**Status**: ✅ Fixed & tested. Input bar now sticky at bottom on mobile/desktop.
+### Phase 1: Theme Infrastructure (3 steps)
+- [x] 1. Extend tailwind.config.js with 5 new WhatsApp-inspired theme colors (whatsapp-green, business-blue, vibrant-purple, sunset-orange, cool-teal)
+- [x] 2. Update index.css with CSS variables for all 9 themes under [data-theme='theme-name']
+- [x] 3. Read/confirm ChatPage.jsx passes theme props to ChatList/ChatWindow/AppShell
 
-**Changes**:
-- ChatWindow.jsx input div: Enhanced sticky positioning + visual separation (shadow/backdrop).
+### Phase 2: Settings UI (2 steps)
+- [x] 4. Update pages/chat/SettingsPage.jsx: Expand theme selector to 9-option grid with previews
+- [x] 5. Update backend User model enum for all 9 themes (controller OK)
+
+### Phase 3: App Integration (3 steps)
+- [x] 6. Activate full theme menu in AppShell.jsx using themeOptions prop
+- [ ] 7. Propagate theme to ChatPage/ChatWindow/ChatList/Sidebar
+- [ ] 8. Add theme-aware accents (buttons, selections, bubbles)
+
+### Phase 4: Mobile Fixes (2 steps)
+- [x] 9. Remove mobile border-radius: ChatList/ChatWindow (rounded-none base)
+- [ ] 10. Test & Completion: Restart dev server, verify mobile no-round, themes app-wide, persistence
+
+**Bonus: Added WhatsApp-style 3-dots menu in ChatWindow** (View Contact, Media, Search, Clear, Delete). Test & enjoy!
 
