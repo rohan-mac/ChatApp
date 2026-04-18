@@ -37,18 +37,80 @@ export const getProfile = asyncHandler(async (req, res) => {
 });
 
 export const updateProfile = asyncHandler(async (req, res) => {
-  const updates = { ...req.validated.body };
+  console.log('=== UPDATE PROFILE REQUEST ===');
+  console.log('User ID:', req.user._id);
+  console.log('Validated body:', req.validated.body);
+  console.log('Has file:', !!req.file);
+  
+  const updates = {};
 
-  if (req.file) {
-    const [attachment] = await uploadAttachment(req.file);
-    updates.profilePic = attachment?.url || '';
+  // Process name field
+  if (req.validated.body.name !== undefined && req.validated.body.name !== null) {
+    const nameValue = String(req.validated.body.name).trim();
+    if (nameValue.length >= 2) {
+      updates.name = nameValue;
+      console.log('Setting name:', updates.name);
+    } else if (nameValue.length > 0) {
+      throw new AppError('Name must be at least 2 characters', 400);
+    }
   }
 
+  // Process bio field
+  if (req.validated.body.bio !== undefined && req.validated.body.bio !== null) {
+    const bioValue = String(req.validated.body.bio).trim();
+    if (bioValue.length <= 160) {
+      updates.bio = bioValue;
+      console.log('Setting bio:', updates.bio);
+    } else {
+      throw new AppError('Bio must be at most 160 characters', 400);
+    }
+  }
+
+  // Process status field
+  if (req.validated.body.status !== undefined && req.validated.body.status !== null) {
+    const statusValue = String(req.validated.body.status).trim();
+    if (statusValue.length <= 80) {
+      updates.status = statusValue;
+      console.log('Setting status:', updates.status);
+    } else {
+      throw new AppError('Status must be at most 80 characters', 400);
+    }
+  }
+
+  // Handle avatar upload if file is provided
+  if (req.file) {
+    try {
+      console.log('Uploading avatar, file size:', req.file.size, 'bytes');
+      const attachments = await uploadAttachment(req.file);
+      if (attachments.length > 0 && attachments[0].url) {
+        updates.profilePic = attachments[0].url;
+        console.log('Avatar processed:', updates.profilePic.substring(0, 50) + '...');
+      }
+    } catch (error) {
+      console.error('Avatar upload error:', error.message);
+      // Log but don't fail - allow profile update to continue
+    }
+  }
+
+  // If there are no updates, return current user
+  if (Object.keys(updates).length === 0) {
+    console.log('No updates to apply');
+    return res.json({ message: 'No updates provided', user: req.user });
+  }
+
+  console.log('Applying updates:', Object.keys(updates));
+  
   const user = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true
   }).select('-passwordHash');
 
+  if (!user) {
+    console.error('User not found after update');
+    throw new AppError('User not found', 404);
+  }
+
+  console.log('Profile updated successfully');
   res.json({ message: 'Profile updated successfully', user });
 });
 

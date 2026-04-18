@@ -31,10 +31,10 @@ export const registerPushTokenSchema = z.object({
 
 export const updateProfileSchema = z.object({
   body: z.object({
-    name: z.string().trim().min(2).max(80).optional(),
-    bio: z.string().trim().max(160).optional(),
-    status: z.string().trim().max(80).optional()
-  }),
+    name: z.string().optional(),
+    bio: z.string().optional(),
+    status: z.string().optional()
+  }).passthrough(),
   query: passthroughObject,
   params: passthroughObject
 });

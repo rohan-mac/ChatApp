@@ -192,5 +192,21 @@ export const useChatStore = create((set, get) => ({
       })),
       people: state.people.map((person) => (person._id === userId ? { ...person, isOnline, lastSeen } : person))
     }));
+  },
+
+  markChatAsRead: (socket, currentUserId) => {
+    const { messages, selectedChat } = get();
+    if (!socket || !selectedChat?._id || !messages.length) return;
+
+    messages.forEach((message) => {
+      if (message.senderId._id !== currentUserId && !message.seenBy?.some((id) => id === currentUserId || id._id === currentUserId)) {
+        socket.emit('message:seen', {
+          messageId: message._id,
+          chatId: selectedChat._id
+        });
+      }
+    });
+
+    get().loadChats();
   }
 }));

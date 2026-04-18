@@ -58,7 +58,14 @@ export const sendMessage = asyncHandler(async (req, res) => {
     }
   }
 
-  const attachments = await uploadAttachment(req.file);
+  let attachments = [];
+  try {
+    attachments = await uploadAttachment(req.file);
+  } catch (error) {
+    console.error('Attachment upload error in sendMessage:', error.message);
+    // Continue without attachment if upload fails
+  }
+
   const spam = evaluateMessageSpam({ text });
   const receiverId =
     chat.type === 'direct'

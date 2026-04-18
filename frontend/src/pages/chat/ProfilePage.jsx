@@ -24,15 +24,32 @@ const ProfilePage = () => {
 
   const saveProfile = async (event) => {
     event.preventDefault();
-    const payload = new FormData();
-    payload.append('name', form.name);
-    payload.append('bio', form.bio);
-    payload.append('status', form.status);
-    if (avatar) payload.append('avatar', avatar);
 
-    const { data } = await api.patch('/users/me', payload);
-    setUser(data.user);
-    pushToast({ title: 'Profile updated', tone: 'success' });
+    // Validate form
+    if (!form.name || form.name.trim().length < 2) {
+      pushToast({ title: 'Name must be at least 2 characters', tone: 'error' });
+      return;
+    }
+
+    try {
+      const payload = new FormData();
+      payload.append('name', form.name.trim());
+      payload.append('bio', form.bio.trim());
+      payload.append('status', form.status.trim());
+      if (avatar) payload.append('avatar', avatar);
+
+      const { data } = await api.patch('/users/me', payload);
+      setUser(data.user);
+      setAvatar(null);
+      pushToast({ title: 'Profile updated successfully', tone: 'success' });
+    } catch (error) {
+      console.error('Profile update error:', error);
+      pushToast({
+        title: 'Failed to update profile',
+        description: error.response?.data?.message || error.message,
+        tone: 'error'
+      });
+    }
   };
 
   const changePassword = async (event) => {
@@ -42,12 +59,26 @@ const ProfilePage = () => {
       return;
     }
 
-    await api.patch('/users/change-password', {
-      currentPassword: passwordForm.currentPassword,
-      newPassword: passwordForm.newPassword
-    });
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    pushToast({ title: 'Password changed', tone: 'success' });
+    if (passwordForm.newPassword.length < 6) {
+      pushToast({ title: 'Password must be at least 6 characters', tone: 'error' });
+      return;
+    }
+
+    try {
+      await api.patch('/users/change-password', {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      });
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      pushToast({ title: 'Password changed successfully', tone: 'success' });
+    } catch (error) {
+      console.error('Password change error:', error);
+      pushToast({
+        title: 'Failed to change password',
+        description: error.response?.data?.message || error.message,
+        tone: 'error'
+      });
+    }
   };
 
   return (
@@ -149,6 +180,7 @@ const ProfilePage = () => {
               <span>Current Password</span>
               <input
                 type="password"
+                autoComplete="current-password"
                 value={passwordForm.currentPassword}
                 onChange={(event) => setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))}
                 className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
@@ -159,6 +191,7 @@ const ProfilePage = () => {
               <span>New Password</span>
               <input
                 type="password"
+                autoComplete="new-password"
                 value={passwordForm.newPassword}
                 onChange={(event) => setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))}
                 className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}
@@ -169,6 +202,7 @@ const ProfilePage = () => {
               <span>Confirm New Password</span>
               <input
                 type="password"
+                autoComplete="new-password"
                 value={passwordForm.confirmPassword}
                 onChange={(event) => setPasswordForm((current) => ({ ...current, confirmPassword: event.target.value }))}
                 className={`rounded-2xl border px-4 py-3 outline-none ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white'}`}

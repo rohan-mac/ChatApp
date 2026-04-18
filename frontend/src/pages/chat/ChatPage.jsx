@@ -74,6 +74,7 @@ const ChatPage = () => {
   const handleUpdatedMessage = useChatStore((state) => state.handleUpdatedMessage);
   const handleDeletedMessage = useChatStore((state) => state.handleDeletedMessage);
   const handlePresenceUpdate = useChatStore((state) => state.handlePresenceUpdate);
+  const markChatAsRead = useChatStore((state) => state.markChatAsRead);
 
   useEffect(() => {
     loadChats(deferredChatSearch).catch(() => {
@@ -118,6 +119,11 @@ const ChatPage = () => {
     socket.emit('chat:join', selectedChat._id);
     return () => socket.emit('chat:leave', selectedChat._id);
   }, [selectedChat?._id, socket]);
+
+  useEffect(() => {
+    if (!selectedChat?._id || !messages.length || !socket.connected) return;
+    markChatAsRead(socket, user.id || user._id);
+  }, [selectedChat?._id, messages.length, socket.connected, markChatAsRead, user]);
 
   useEffect(() => {
     if (!selectedChat?._id) {

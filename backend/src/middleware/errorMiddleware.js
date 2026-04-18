@@ -12,7 +12,8 @@ export const errorHandler = (error, req, res, next) => {
     path: req.originalUrl,
     method: req.method,
     stack: error.stack,
-    details: error.details
+    details: error.details,
+    error: error.toString()
   });
 
   if (error instanceof ZodError) {
@@ -24,6 +25,7 @@ export const errorHandler = (error, req, res, next) => {
 
   return res.status(statusCode >= 400 ? statusCode : 500).json({
     message: error.message || 'Server error',
-    details: error.details || undefined
+    details: error.details || undefined,
+    timestamp: new Date().toISOString()
   });
 };
