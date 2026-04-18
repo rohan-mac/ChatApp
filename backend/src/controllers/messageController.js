@@ -7,6 +7,7 @@ import { User } from '../models/User.js';
 import { uploadAttachment } from '../services/mediaService.js';
 import { sendPushNotification } from '../services/notificationService.js';
 import { evaluateMessageSpam } from '../services/spamService.js';
+import { logger } from '../utils/logger.js';
 
 const messagePopulate = [
   { path: 'senderId', select: 'name email profilePic' },
@@ -41,12 +42,14 @@ const assertChatAccess = async (chatId, userId) => {
 export const sendMessage = asyncHandler(async (req, res) => {
   const { chatId, text = '', replyTo, clientMessageId } = req.validated.body;
 
+  // Validate that message has either text or attachment
   if (!text.trim() && !req.file) {
     throw new AppError('Message text or attachment is required', 400);
   }
 
   const chat = await assertChatAccess(chatId, req.user._id);
 
+  // Check for duplicate message (idempotency)
   if (clientMessageId) {
     const duplicate = await Message.findOne({
       senderId: req.user._id,
@@ -54,26 +57,53 @@ export const sendMessage = asyncHandler(async (req, res) => {
     }).populate(messagePopulate);
 
     if (duplicate) {
+      logger.debug('Duplicate message detected, returning existing message', {
+        clientMessageId,
+        messageId: duplicate._id
+      });
       return res.status(200).json(duplicate);
     }
   }
 
+  // Upload attachment if provided
   let attachments = [];
-  try {
-    attachments = await uploadAttachment(req.file);
-  } catch (error) {
-    console.error('Attachment upload error in sendMessage:', error.message);
-    // Continue without attachment if upload fails
+  if (req.file) {
+    try {
+      logger.debug('Uploading message attachment', {
+        filename: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype
+      });
+
+      attachments = await uploadAttachment(req.file);
+      
+      logger.info('Message attachment uploaded successfully', {
+        messageId: clientMessageId,
+        attachmentCount: attachments.length
+      });
+    } catch (error) {
+      logger.error('Attachment upload failed in sendMessage', {
+        error: error.message,
+        filename: req.file?.originalname
+      });
+      throw error; // Let error middleware handle it
+    }
   }
 
+  // Evaluate message for spam
   const spam = evaluateMessageSpam({ text });
+  
+  // Determine receiver for direct messages
   const receiverId =
     chat.type === 'direct'
       ? chat.participants.find((participantId) => participantId.toString() !== req.user._id.toString()) || null
       : null;
+
+  // Set message type based on attachment
   const messageType = attachments[0]?.type || 'text';
   const mediaUrl = attachments[0]?.url || '';
 
+  // Create message
   const message = await Message.create({
     chatId,
     senderId: req.user._id,
@@ -89,13 +119,20 @@ export const sendMessage = asyncHandler(async (req, res) => {
     isSpam: spam.isSpam
   });
 
+  // Update chat's last message
   chat.lastMessageId = message._id;
   await chat.save();
 
+  // Populate message data
   const populated = await Message.findById(message._id).populate(messagePopulate);
-  const recipientIds = chat.participants.filter((participantId) => participantId.toString() !== req.user._id.toString());
+  
+  // Get recipient list for notifications
+  const recipientIds = chat.participants.filter(
+    (participantId) => participantId.toString() !== req.user._id.toString()
+  );
   const recipients = await User.find({ _id: { $in: recipientIds } }).select('pushTokens');
 
+  // Send push notifications
   await Promise.all(
     recipients.map((recipient) =>
       sendPushNotification({
@@ -107,12 +144,21 @@ export const sendMessage = asyncHandler(async (req, res) => {
     )
   );
 
+  // Emit real-time update
   const io = req.app.get('io');
   const serialized = serializeMessage(populated, req.user._id);
   io?.to(chat._id.toString()).emit('message:new', serialized);
   recipientIds.forEach((recipientId) => {
     io?.to(recipientId.toString()).emit('message:new', serialized);
   });
+
+  logger.info('Message sent successfully', {
+    messageId: message._id,
+    chatId,
+    hasAttachment: attachments.length > 0,
+    isSpam: spam.isSpam
+  });
+
   res.status(201).json(serialized);
 });
 

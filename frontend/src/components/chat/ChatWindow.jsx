@@ -310,6 +310,7 @@ const ChatWindow = ({
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState('bottom');
+  const [attachmentPreview, setAttachmentPreview] = useState(null);
   const emojiContainerRef = useRef(null);
 
   const isOcean = theme === 'ocean';
@@ -333,6 +334,13 @@ const ChatWindow = ({
       setEmojiPickerPosition('bottom');
     }
   }, [showEmoji]);
+
+  // Clear attachment preview when attachment is cleared
+  useEffect(() => {
+    if (!attachment) {
+      setAttachmentPreview(null);
+    }
+  }, [attachment]);
 
   return (
     <section
@@ -416,12 +424,59 @@ const ChatWindow = ({
         <input
           ref={fileRef}
           type="file"
+          accept="image/*,video/*,.pdf,.doc,.docx,.txt"
           className="hidden"
-          onChange={(e) => setAttachment(e.target.files?.[0] || null)}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              setAttachment(file);
+              if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (event) => setAttachmentPreview(event.target.result);
+                reader.readAsDataURL(file);
+              } else {
+                setAttachmentPreview(null);
+              }
+            }
+          }}
         />
 
-        {attachment && (
-          <div className="text-xs mb-2">{attachment.name}</div>
+        {attachmentPreview && (
+          <div className="mb-3 rounded-lg overflow-hidden relative">
+            <img src={attachmentPreview} alt="Preview" className="h-32 w-full object-cover rounded-lg shadow-md" />
+            <div className="flex items-center justify-between p-2 bg-black/50 text-white text-xs">
+              <span>{attachment?.name}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setAttachment(null);
+                  if (fileRef.current) fileRef.current.value = '';
+                }}
+                className="ml-2 px-2 py-1 hover:bg-red-500 rounded transition-colors"
+              >
+                ✕ Remove
+              </button>
+            </div>
+          </div>
+        )}
+
+        {attachment && !attachmentPreview && (
+          <div className="mb-3 text-xs font-medium flex items-center justify-between gap-2 p-2 bg-blue-50 rounded-lg">
+            <div className="flex items-center gap-2">
+              <span>📎</span>
+              <span>{attachment.name}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setAttachment(null);
+                if (fileRef.current) fileRef.current.value = '';
+              }}
+              className="px-2 py-1 hover:bg-red-200 rounded transition-colors"
+            >
+              ✕ Remove
+            </button>
+          </div>
         )}
 
         {editTarget && (
@@ -438,7 +493,13 @@ const ChatWindow = ({
           onSend={performSend}
           disabled={!selectedChat}
           sending={sending}
+          hasAttachment={Boolean(attachment)}
           inputRef={inputRef}
+          selectedChat={selectedChat}
+          socket={socket}
+          userId={currentUserId}
+          isDark={isDark}
+          theme={theme}
         />
 
         {/* EMOJI */}

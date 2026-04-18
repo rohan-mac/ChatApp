@@ -1,82 +1,94 @@
-import cloudinary, { isCloudinaryEnabled } from '../config/cloudinary.js';
+import { uploadMessageAttachment, uploadAvatar } from './uploadService.js';
 import { logger } from '../utils/logger.js';
+import { AppError } from '../lib/appError.js';
 
+/**
+ * Upload attachment for message
+ * 
+ * This function handles uploading message attachments (images, videos, documents)
+ * directly to Cloudinary. No local fallback.
+ * 
+ * @param {Object} file - Multer file object
+ * @returns {Promise<Array>} Array with single attachment object containing Cloudinary URL
+ * @throws {AppError} If upload fails
+ */
 export const uploadAttachment = async (file) => {
-  if (!file) return [];
-
-  const type = file.mimetype.startsWith('image')
-    ? 'image'
-    : file.mimetype.startsWith('video')
-      ? 'video'
-      : 'document';
-
-  // If Cloudinary is not enabled, return local storage URL
-  if (!isCloudinaryEnabled) {
-    logger.debug('Cloudinary disabled, using local storage URL');
-    return [
-      {
-        url: `local://${file.originalname}`,
-        type,
-        name: file.originalname,
-        size: file.size
-      }
-    ];
+  if (!file) {
+    return [];
   }
 
   try {
-    logger.debug('Attempting Cloudinary upload', { filename: file.originalname, size: file.size });
-
-    const result = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { resource_type: 'auto', folder: 'chatapp/media', timeout: 60000 },
-        (error, uploadResult) => {
-          if (error) {
-            logger.error('Cloudinary upload stream error', { error: error.message });
-            reject(error);
-          } else {
-            logger.debug('Cloudinary upload successful', { url: uploadResult.secure_url });
-            resolve(uploadResult);
-          }
-        }
-      );
-
-      if (!uploadStream) {
-        const err = new Error('Failed to create Cloudinary upload stream');
-        logger.error('Upload stream creation failed', { error: err.message });
-        return reject(err);
-      }
-
-      uploadStream.on('error', (err) => {
-        logger.error('Cloudinary stream error event', { error: err.message });
-        reject(err);
-      });
-
-      uploadStream.end(file.buffer);
-    });
+    const uploadResult = await uploadMessageAttachment(file);
+    
+    if (!uploadResult) {
+      return [];
+    }
 
     return [
       {
-        url: result.secure_url,
-        type,
-        name: file.originalname,
-        size: file.size
+        url: uploadResult.url,
+        public_id: uploadResult.public_id,
+        type: uploadResult.type,
+        name: uploadResult.name,
+        size: uploadResult.size,
+        width: uploadResult.width,
+        height: uploadResult.height,
+        duration: uploadResult.duration
       }
     ];
   } catch (error) {
-    // Log the error and fall back to local storage URL
-    logger.warn('Cloudinary upload failed, using local fallback', {
-      filename: file.originalname,
-      error: error.message,
-      code: error.code
+    logger.error('Attachment upload failed in mediaService', {
+      filename: file?.originalname,
+      error: error.message
     });
+    throw error;
+  }
+};
 
-    return [
-      {
-        url: `local://${Date.now()}_${file.originalname}`,
-        type,
-        name: file.originalname,
-        size: file.size
-      }
-    ];
+/**
+ * Upload user profile picture
+ * 
+ * This function handles uploading profile avatars to Cloudinary.
+ * 
+ * @param {Object} file - Multer file object
+ * @returns {Promise<string>} Cloudinary URL for the avatar
+ * @throws {AppError} If upload fails
+ */
+export const uploadProfilePicture = async (file) => {
+  if (!file) {
+    return null;
+  }
+
+  try {
+    const uploadResult = await uploadAvatar(file);
+    return uploadResult.url;
+  } catch (error) {
+    logger.error('Profile picture upload failed in mediaService', {
+      filename: file?.originalname,
+      error: error.message
+    });
+    throw error;
+  }
+};
+
+/**
+ * Extract Cloudinary public_id from URL
+ * 
+ * Useful for deletion and management of stored files
+ * 
+ * @param {string} url - Cloudinary secure URL
+ * @returns {string|null} Public ID or null
+ */
+export const extractPublicIdFromUrl = (url) => {
+  if (!url || typeof url !== 'string') {
+    return null;
+  }
+
+  try {
+    const match = url.match(/\/([^/]+\/[^/.]+)(?:\.[^/]*)?$/);
+    return match ? match[1] : null;
+  } catch (error) {
+    logger.warn('Failed to extract public ID from URL', { url, error: error.message });
+    return null;
   }
 };

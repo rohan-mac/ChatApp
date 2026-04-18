@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import multer from 'multer';
 import {
   blockUser,
   changePassword,
@@ -15,6 +14,7 @@ import {
 } from '../controllers/userController.js';
 import { isAdmin, verifyToken } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middleware/validateRequest.js';
+import { uploadAvatar } from '../middleware/uploadMiddleware.js';
 import {
   blockUserSchema,
   changePasswordSchema,
@@ -25,14 +25,10 @@ import {
 } from '../validators/userValidator.js';
 
 const router = Router();
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }
-});
 
 router.get('/', verifyToken, validateRequest(searchUsersSchema), getUsers);
 router.get('/me', verifyToken, getProfile);
-router.patch('/me', verifyToken, upload.single('avatar'), validateRequest(updateProfileSchema), updateProfile);
+router.patch('/me', verifyToken, uploadAvatar.single('avatar'), validateRequest(updateProfileSchema), updateProfile);
 router.patch('/preferences', verifyToken, validateRequest(updatePreferencesSchema), updatePreferences);
 router.patch('/change-password', verifyToken, validateRequest(changePasswordSchema), changePassword);
 router.post('/push-token', verifyToken, validateRequest(registerPushTokenSchema), registerPushToken);

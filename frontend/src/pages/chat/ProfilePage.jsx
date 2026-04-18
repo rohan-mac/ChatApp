@@ -21,6 +21,19 @@ const ProfilePage = () => {
     confirmPassword: ''
   });
   const [avatar, setAvatar] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+
+  const handleAvatarChange = (event) => {
+    const file = event.target.files?.[0] || null;
+    setAvatar(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => setAvatarPreview(e.target.result);
+      reader.readAsDataURL(file);
+    } else {
+      setAvatarPreview(null);
+    }
+  };
 
   const saveProfile = async (event) => {
     event.preventDefault();
@@ -41,6 +54,7 @@ const ProfilePage = () => {
       const { data } = await api.patch('/users/me', payload);
       setUser(data.user);
       setAvatar(null);
+      setAvatarPreview(null);
       pushToast({ title: 'Profile updated successfully', tone: 'success' });
     } catch (error) {
       console.error('Profile update error:', error);
@@ -131,7 +145,21 @@ const ProfilePage = () => {
 
         <aside className={`rounded-[30px] border p-6 ${theme === 'dark' ? 'border-white/10 bg-white/5' : 'border-white/70 bg-white/82'}`}>
           <div className="flex flex-col items-center text-center">
-            {user?.profilePic ? (
+            {avatarPreview ? (
+              <div className="relative">
+                <img src={avatarPreview} alt="Preview" className="h-28 w-28 rounded-full object-cover shadow-lg ring-2 ring-sky-500" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAvatar(null);
+                    setAvatarPreview(null);
+                  }}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold hover:bg-red-600 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : user?.profilePic ? (
               <img src={user.profilePic} alt={user.name} className="h-28 w-28 rounded-full object-cover" />
             ) : (
               <div className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-3xl font-semibold text-white">
@@ -141,11 +169,11 @@ const ProfilePage = () => {
             <p className="mt-4 text-lg font-semibold">{user?.name}</p>
             <p className="text-sm opacity-70">{user?.email}</p>
             <label className={`mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[22px] border px-4 py-3 text-sm ${
-              theme === 'dark' ? 'border-white/10 bg-white/6' : 'border-white/80 bg-white/85'
-            }`}>
+              theme === 'dark' ? 'border-white/10 bg-white/6 hover:bg-white/10' : 'border-white/80 bg-white/85 hover:bg-white/95'
+            } transition-colors`}>
               <Camera size={16} />
               <span>{avatar ? avatar.name : 'Choose avatar'}</span>
-              <input type="file" className="hidden" onChange={(event) => setAvatar(event.target.files?.[0] || null)} />
+              <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
             </label>
             <button type="submit" className="mt-6 inline-flex items-center gap-2 rounded-[22px] bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(59,130,246,0.26)]">
               <Save size={16} />

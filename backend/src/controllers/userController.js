@@ -2,7 +2,8 @@ import bcrypt from 'bcryptjs';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { AppError } from '../lib/appError.js';
 import { User } from '../models/User.js';
-import { uploadAttachment } from '../services/mediaService.js';
+import { uploadProfilePicture } from '../services/mediaService.js';
+import { logger } from '../utils/logger.js';
 
 export const getUsers = asyncHandler(async (req, res) => {
   const { search = '', page = 1, limit = 20 } = req.validated.query;
@@ -37,11 +38,12 @@ export const getProfile = asyncHandler(async (req, res) => {
 });
 
 export const updateProfile = asyncHandler(async (req, res) => {
-  console.log('=== UPDATE PROFILE REQUEST ===');
-  console.log('User ID:', req.user._id);
-  console.log('Validated body:', req.validated.body);
-  console.log('Has file:', !!req.file);
-  
+  logger.debug('Updating profile', {
+    userId: req.user._id,
+    hasFile: !!req.file,
+    body: req.validated.body
+  });
+
   const updates = {};
 
   // Process name field
@@ -49,7 +51,6 @@ export const updateProfile = asyncHandler(async (req, res) => {
     const nameValue = String(req.validated.body.name).trim();
     if (nameValue.length >= 2) {
       updates.name = nameValue;
-      console.log('Setting name:', updates.name);
     } else if (nameValue.length > 0) {
       throw new AppError('Name must be at least 2 characters', 400);
     }
@@ -60,7 +61,6 @@ export const updateProfile = asyncHandler(async (req, res) => {
     const bioValue = String(req.validated.body.bio).trim();
     if (bioValue.length <= 160) {
       updates.bio = bioValue;
-      console.log('Setting bio:', updates.bio);
     } else {
       throw new AppError('Bio must be at most 160 characters', 400);
     }
@@ -71,7 +71,6 @@ export const updateProfile = asyncHandler(async (req, res) => {
     const statusValue = String(req.validated.body.status).trim();
     if (statusValue.length <= 80) {
       updates.status = statusValue;
-      console.log('Setting status:', updates.status);
     } else {
       throw new AppError('Status must be at most 80 characters', 400);
     }
@@ -80,37 +79,54 @@ export const updateProfile = asyncHandler(async (req, res) => {
   // Handle avatar upload if file is provided
   if (req.file) {
     try {
-      console.log('Uploading avatar, file size:', req.file.size, 'bytes');
-      const attachments = await uploadAttachment(req.file);
-      if (attachments.length > 0 && attachments[0].url) {
-        updates.profilePic = attachments[0].url;
-        console.log('Avatar processed:', updates.profilePic.substring(0, 50) + '...');
+      logger.debug('Uploading avatar', {
+        filename: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype
+      });
+
+      const avatarUrl = await uploadProfilePicture(req.file);
+      if (avatarUrl) {
+        updates.profilePic = avatarUrl;
+        logger.info('Avatar uploaded successfully', {
+          userId: req.user._id,
+          url: avatarUrl
+        });
       }
     } catch (error) {
-      console.error('Avatar upload error:', error.message);
-      // Log but don't fail - allow profile update to continue
+      logger.error('Avatar upload failed in updateProfile', {
+        userId: req.user._id,
+        error: error.message
+      });
+      throw error; // Let error middleware handle it
     }
   }
 
   // If there are no updates, return current user
   if (Object.keys(updates).length === 0) {
-    console.log('No updates to apply');
+    logger.debug('No updates provided');
     return res.json({ message: 'No updates provided', user: req.user });
   }
 
-  console.log('Applying updates:', Object.keys(updates));
-  
+  logger.debug('Applying profile updates', {
+    userId: req.user._id,
+    fields: Object.keys(updates)
+  });
+
   const user = await User.findByIdAndUpdate(req.user._id, updates, {
     new: true,
     runValidators: true
   }).select('-passwordHash');
 
   if (!user) {
-    console.error('User not found after update');
     throw new AppError('User not found', 404);
   }
 
-  console.log('Profile updated successfully');
+  logger.info('Profile updated successfully', {
+    userId: req.user._id,
+    updatedFields: Object.keys(updates)
+  });
+
   res.json({ message: 'Profile updated successfully', user });
 });
 

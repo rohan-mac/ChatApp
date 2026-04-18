@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import multer from 'multer';
 import {
   deleteMessage,
   editMessage,
@@ -13,6 +12,7 @@ import {
 } from '../controllers/messageController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middleware/validateRequest.js';
+import { uploadAttachment } from '../middleware/uploadMiddleware.js';
 import {
   deleteMessageSchema,
   editMessageSchema,
@@ -26,12 +26,8 @@ import {
 } from '../validators/messageValidator.js';
 
 const router = Router();
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 }
-});
 
-router.post('/', verifyToken, upload.single('file'), validateRequest(sendMessageSchema), sendMessage);
+router.post('/', verifyToken, uploadAttachment.single('file'), validateRequest(sendMessageSchema), sendMessage);
 router.get('/search', verifyToken, validateRequest(searchMessagesSchema), searchMessages);
 router.get('/:chatId', verifyToken, validateRequest(listMessagesSchema), getMessagesByChat);
 router.patch('/:id', verifyToken, validateRequest(editMessageSchema), editMessage);
