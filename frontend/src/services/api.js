@@ -38,6 +38,21 @@ api.interceptors.response.use(
   async (error) => {
     const config = error.config;
 
+    // Handle 401 (Unauthorized) - token likely expired
+    if (error.response?.status === 401) {
+      // Clear invalid token
+      localStorage.removeItem('token');
+      
+      // Optionally redirect after a delay to allow error toast to show
+      setTimeout(() => {
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }, 2000);
+      
+      return Promise.reject(error);
+    }
+
     if (!config || !shouldRetry(error)) {
       return Promise.reject(error);
     }

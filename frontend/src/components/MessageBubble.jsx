@@ -107,7 +107,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { EllipsisVertical, Pencil, Star, StarOff, Trash2 } from 'lucide-react';
+import { EllipsisVertical, Pencil, Star, StarOff, Trash2, FileText, Video } from 'lucide-react';
 
 const formatTime = (value) =>
   value
@@ -116,6 +116,57 @@ const formatTime = (value) =>
       minute: '2-digit'
     })
     : '';
+
+/**
+ * Render attachment based on type
+ */
+const renderAttachment = (attachment) => {
+  if (!attachment) return null;
+
+  const { url, type, name } = attachment;
+
+  if (type === 'image') {
+    return (
+      <img
+        src={url}
+        alt={name || 'image'}
+        className="w-full rounded-lg max-w-sm object-cover mb-2"
+        onError={(e) => {
+          e.target.style.display = 'none';
+        }}
+      />
+    );
+  }
+
+  if (type === 'video') {
+    return (
+      <video
+        src={url}
+        controls
+        className="w-full rounded-lg max-w-sm object-cover mb-2"
+        onError={(e) => {
+          e.target.style.display = 'none';
+        }}
+      />
+    );
+  }
+
+  if (type === 'document') {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 mb-2 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+      >
+        <FileText size={16} />
+        <span className="text-xs truncate">{name || 'Document'}</span>
+      </a>
+    );
+  }
+
+  return null;
+};
 
 const MessageBubble = ({
   message,
@@ -181,10 +232,23 @@ mt-[10px]
           <EllipsisVertical size={12} />
         </button>
 
+        {/* ATTACHMENTS */}
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="mb-2">
+            {message.attachments.map((attachment, idx) => (
+              <div key={idx}>
+                {renderAttachment(attachment)}
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* MESSAGE TEXT */}
-        <p className="whitespace-pre-wrap break-words pr-5 sm:pr-6 text-xs sm:text-sm leading-snug">
-          {text}
-        </p>
+        {text && text !== 'No content' && (
+          <p className="whitespace-pre-wrap break-words pr-5 sm:pr-6 text-xs sm:text-sm leading-snug">
+            {text}
+          </p>
+        )}
 
         {/* TIME */}
         <div

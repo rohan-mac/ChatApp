@@ -430,11 +430,13 @@ const ChatWindow = ({
             const file = e.target.files?.[0];
             if (file) {
               setAttachment(file);
-              if (file.type.startsWith('image/')) {
+              // Show preview for images and videos
+              if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
                 const reader = new FileReader();
                 reader.onload = (event) => setAttachmentPreview(event.target.result);
                 reader.readAsDataURL(file);
               } else {
+                // Non-media files (PDF, DOC, etc.) show null preview
                 setAttachmentPreview(null);
               }
             }
@@ -443,7 +445,11 @@ const ChatWindow = ({
 
         {attachmentPreview && (
           <div className="mb-3 rounded-lg overflow-hidden relative">
-            <img src={attachmentPreview} alt="Preview" className="h-32 w-full object-cover rounded-lg shadow-md" />
+            {attachment?.type.startsWith('image/') ? (
+              <img src={attachmentPreview} alt="Preview" className="h-32 w-full object-cover rounded-lg shadow-md" />
+            ) : attachment?.type.startsWith('video/') ? (
+              <video src={attachmentPreview} className="h-32 w-full object-cover rounded-lg shadow-md" controls={false} />
+            ) : null}
             <div className="flex items-center justify-between p-2 bg-black/50 text-white text-xs">
               <span>{attachment?.name}</span>
               <button
