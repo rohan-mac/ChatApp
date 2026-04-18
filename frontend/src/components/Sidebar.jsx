@@ -278,6 +278,7 @@ const Sidebar = ({
   mobileOpen,
   setMobileOpen,
   user,
+  showMobileBottomNav = true,
 }) => {
   const location = useLocation();
   const { logout } = useAuth();
@@ -448,17 +449,19 @@ const Sidebar = ({
       </aside>
 
       {/* MOBILE BOTTOM NAV */}
-      <nav
-        className={`fixed bottom-0 left-0 right-0 md:hidden z-50 flex gap-2 p-2 pb-[env(safe-area-inset-bottom)] border-t backdrop-blur-xl ${
-          isDark
-            ? 'bg-slate-900/95 border-white/10'
-            : 'bg-white/95 border-slate-200'
-        }`}
-      >
-        {mobileBottomItems.map((item) => (
-          <MobileNavItem key={item.to} item={item} />
-        ))}
-      </nav>
+      {showMobileBottomNav && (
+        <nav
+          className={`fixed bottom-0 left-0 right-0 z-50 flex gap-2 border-t p-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden ${
+            isDark
+              ? 'border-white/10 bg-slate-900/95'
+              : 'border-slate-200 bg-white/95'
+          }`}
+        >
+          {mobileBottomItems.map((item) => (
+            <MobileNavItem key={item.to} item={item} />
+          ))}
+        </nav>
+      )}
     </>
   );
 };

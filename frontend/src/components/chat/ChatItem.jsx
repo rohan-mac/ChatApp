@@ -149,7 +149,7 @@ const ChatItem = ({ chat, active, onOpen, name, preview, isDark, theme }) => {
 
       {/* Badge */}
       {badge > 0 ? (
-        <span className="inline-flex min-w-[1.5rem] sm:min-w-[1.75rem] items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg">
+        <span className="inline-flex min-w-[1.5rem] h-6 sm:h-7 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold text-white shadow-lg">
           {badge}
         </span>
       ) : null}

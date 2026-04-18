@@ -152,7 +152,7 @@ const ChatList = ({
       }`;
 
   return (
-    <aside className="flex h-full flex-col overflow-hidden border border-slate-200/50 bg-gradient-to-br from-white via-slate-50 to-white shadow-xl rounded-2xl sm:rounded-3xl">
+    <aside className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200/50 bg-gradient-to-br from-white via-slate-50 to-white shadow-xl sm:rounded-3xl">
       
       {/* Header */}
       <div className="sticky top-0 z-10 border-b border-slate-200/50 bg-gradient-to-r from-white via-slate-50 to-white px-4 sm:px-6 py-4 sm:py-5 rounded-t-2xl sm:rounded-t-3xl">
@@ -189,7 +189,7 @@ const ChatList = ({
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-50/30 via-white to-slate-100/30 px-3 sm:px-4 pb-4 sm:pb-6 pt-3 sm:pt-4">
+      <div className="minimal-scrollbar flex-1 overflow-y-auto bg-gradient-to-b from-slate-50/30 via-white to-slate-100/30 px-3 pb-4 pt-3 sm:px-4 sm:pb-6 sm:pt-4">
         
         {loading ? (
           <div className="flex items-center gap-2 sm:gap-3 bg-slate-100/80 px-3 sm:px-4 py-3 sm:py-4 rounded-xl sm:rounded-2xl border border-slate-200/50 shadow-sm">

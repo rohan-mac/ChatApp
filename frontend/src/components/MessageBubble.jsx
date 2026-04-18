@@ -194,22 +194,21 @@ const MessageBubble = ({
       initial={{ opacity: 0, y: 8, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.2 }}
-      className={`group flex ${isMine ? 'justify-end' : 'justify-start'}`}
+      className={`group flex ${isMine ? 'justify-end' : 'justify-start'} px-1 sm:px-0`}
       onContextMenu={(e) => {
         e.preventDefault();
         setMenuOpen((p) => !p);
       }}
     >
       <div
-        className={`
+        className={`mb-1 sm:mb-2
         relative 
-        max-w-[82%] sm:max-w-[70%] md:max-w-[60%]
+        max-w-[90%] xs:max-w-[85%] sm:max-w-[75%] md:max-w-[65%]
         rounded-2xl 
-        px-3 sm:px-4 
-        py-1.5 sm:py-2   /* 🔥 reduced height */
+        px-3 sm:px-4 md:px-5
+        py-2 sm:py-2.5
         transition-all duration-200 
-        hover:shadow-md 
-mt-[10px]
+        hover:shadow-md
         ${bubbleClasses}
         `}
       >
@@ -245,7 +244,7 @@ mt-[10px]
 
         {/* MESSAGE TEXT */}
         {text && text !== 'No content' && (
-          <p className="whitespace-pre-wrap break-words pr-5 sm:pr-6 text-xs sm:text-sm leading-snug">
+          <p className="whitespace-pre-wrap break-words pr-5 sm:pr-6 text-sm sm:text-base leading-snug">
             {text}
           </p>
         )}

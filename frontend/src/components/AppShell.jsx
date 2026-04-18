@@ -201,7 +201,8 @@ const AppShell = ({
   showHeader = true,
   themeOptions = [],
   onThemeSelect,
-  showSidebar = true
+  showSidebar = true,
+  showMobileBottomNav = true
 }) => {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -243,6 +244,7 @@ const AppShell = ({
             mobileOpen={mobileOpen}
             setMobileOpen={setMobileOpen}
             user={user}
+            showMobileBottomNav={showMobileBottomNav}
             showMobileMenu={showMobileMenu}
             setShowMobileMenu={setShowMobileMenu}
           />
@@ -251,7 +253,7 @@ const AppShell = ({
         {/* MAIN PANEL */}
         <div
           className={`relative z-10 flex flex-col flex-1 rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden ${shellClasses} ${
-            showSidebar ? 'mb-20 md:mb-0' : ''
+            showSidebar && showMobileBottomNav ? 'mb-20 md:mb-0' : ''
           }`}
         >
 

@@ -273,6 +273,7 @@ const ChatPage = () => {
     <AppShell
       showHeader={false}
       showSidebar={true}
+      showMobileBottomNav={showConversations}
       theme={theme}
       themeOptions={themeOptions}
       onThemeSelect={setTheme}
@@ -288,11 +289,11 @@ const ChatPage = () => {
         </button>
       ) : null}
     >
-      <div className="grid w-full h-full min-h-[500px] gap-3 auto-rows-max lg:auto-rows-fr lg:grid-cols-[360px_minmax(0,1fr)] overflow-hidden">
+      <div className="grid h-full min-h-0 w-full gap-3 overflow-hidden lg:grid-cols-[360px_minmax(0,1fr)]">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          className={`min-h-0 ${showConversations ? 'block' : 'hidden lg:block'}`}
+          className={`h-full min-h-0 ${showConversations ? 'block' : 'hidden lg:block'}`}
         >
           <ChatList
             chats={filteredChats}
@@ -315,7 +316,11 @@ const ChatPage = () => {
           />
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={`min-h-0 ${showConversations ? 'hidden lg:flex' : 'flex'} flex-col`}>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`h-full min-h-0 ${showConversations ? 'hidden lg:flex' : 'flex'} flex-col`}
+        >
           <ChatWindow
             isDark={isDark}
             selectedChat={selectedChat}
