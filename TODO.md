@@ -1,14 +1,17 @@
-# Chat App Updates COMPLETE
+# Call UI Enhancements (WhatsApp-style Popups/Pages)
+## Completed
+- [x] Analyzed repo - Core incoming popup exists in CallModal.jsx, globals in main.jsx
+- [x] 1. Enhanced CallModal.jsx - Added outgoing "Calling..." state, real names/avatars, conditional buttons/status
 
-## Original Task:
-- ✅ Removed toggle button from chat window header
-- Header now WhatsApp-style: back | info | audio | video | three-dots
+## Plan Steps
+2. [x] Fixed ChatWindow.jsx - Corrected `useCall` import to CallContext, polished call buttons with motion/shadow
+3. [x] Updated callStore.js - Added callHistory[] (tracks ended calls w/ duration/dir), clearHistory()
+4. [x] Updated CallsPage.jsx - Real history UI w/ avatars, direction icons (incoming/outgoing), duration, quick redial, empty state, animations
+5. [ ] Polish active screens (VideoCallScreen/AudioCallScreen) + ensure full integration
+6. [ ] Test full flow
 
-## Feedback Fix:
-- ✅ Added `text-[var(--text-primary)]` to audio/video/three-dots buttons
-- ✅ Unified padding (`p-2`) and icon size (`size={20}`) for consistency
-- Icons now visible across all themes (light/dark/ocean/rose) via CSS vars
+## Testing
+- cd frontend && npm run dev
+- cd backend && npm run dev  
+- Open 2 browser tabs (different users), test audio/video calls: initiate → incoming/outgoing popup → answer/decline → active screen → end
 
-**Files updated:** `frontend/src/components/chat/ChatWindow.jsx`, `TODO.md`
-
-**Next:** Reload dev server (`cd frontend && npm run dev`) and test all themes. No issues found.

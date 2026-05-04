@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import EmojiPicker from 'emoji-picker-react';
 import { LoaderCircle, MoreVertical, Phone, Video, X, ChevronLeft } from 'lucide-react';
 import { Z_INDEX } from '../../constants/zIndex';
-import { useCall } from '../../hooks/useCall';
+import { useCall } from '../../context/CallContext';
 import MessageBubble from '../MessageBubble';
 import InputBar from './InputBar';
 
@@ -129,20 +129,24 @@ const ChatWindow = ({
 
         {selectedChat && (
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => selectedChat && selectedChat.counterpart?._id && startCall(selectedChat.counterpart._id, 'audio', selectedChat._id)}
-              className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/10 transition-all flex items-center justify-center"
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => selectedChat?.counterpart?._id && startCall(selectedChat.counterpart._id, 'audio', selectedChat._id)}
+              className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/20 backdrop-blur-sm transition-all flex items-center justify-center shadow-md hover:shadow-lg"
               title="Audio call"
             >
               <Phone size={20} />
-            </button>
-            <button
-              onClick={() => selectedChat && selectedChat.counterpart?._id && startCall(selectedChat.counterpart._id, 'video', selectedChat._id)}
-              className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/10 transition-all flex items-center justify-center"
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => selectedChat?.counterpart?._id && startCall(selectedChat.counterpart._id, 'video', selectedChat._id)}
+              className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/20 backdrop-blur-sm transition-all flex items-center justify-center shadow-md hover:shadow-lg"
               title="Video call"
             >
               <Video size={20} />
-            </button>
+            </motion.button>
             <div className="relative">
               <button onClick={() => setOptionsOpen(!optionsOpen)} className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
                 <MoreVertical size={20} />

@@ -12,6 +12,7 @@ export const useCallStore = create(
       localMute: false,
       localVideo: true,
       callDuration: 0,
+      callHistory: [],
       
       // Actions
       startCall: (peerId, type, chatId) => {
@@ -49,14 +50,37 @@ export const useCallStore = create(
       },
 
       endCall: (reason = 'ended') => {
-        set({
-          currentCall: null,
-          callDuration: 0,
-          localMute: false,
-          localVideo: true
-        });
+        const current = get().currentCall;
+        if (current) {
+          const historyItem = {
+            id: current.id,
+            peerId: current.peerId,
+            type: current.type,
+            chatId: current.chatId,
+            duration: get().callDuration,
+            reason,
+            timestamp: Date.now(),
+            direction: current.status === 'calling' ? 'outgoing' : 'answered' // Will refine on backend
+          };
+          set((state) => ({
+            callHistory: [historyItem, ...state.callHistory.slice(0, 49)],
+            currentCall: null,
+            callDuration: 0,
+            localMute: false,
+            localVideo: true
+          }));
+        } else {
+          set({
+            currentCall: null,
+            callDuration: 0,
+            localMute: false,
+            localVideo: true
+          });
+        }
         window.callApi?.endCall?.(reason);
       },
+
+      clearHistory: () => set({ callHistory: [] }),
 
       updateCallStatus: (status) => {
         set((state) => ({
@@ -74,7 +98,8 @@ export const useCallStore = create(
         incomingCalls: [],
         localMute: false,
         localVideo: true,
-        callDuration: 0
+        callDuration: 0,
+        callHistory: []
       })
     }),
     {
