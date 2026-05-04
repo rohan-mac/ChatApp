@@ -1,4 +1,4 @@
-  import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+  import { useDeferredValue, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Archive } from 'lucide-react';
 import AppShell from '../../components/AppShell';
@@ -6,10 +6,11 @@ import ChatList from '../../components/chat/ChatList';
 import ChatWindow from '../../components/chat/ChatWindow';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useSocket } from '../../hooks/useSocket';
-import useThemeMode from '../../hooks/useThemeMode';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useChatStore } from '../../store/chatStore';
+import { notificationService } from '../../services/notificationService';
 
 const chatName = (chat) => chat?.counterpart?.name || chat?.title || 'Conversation';
 const chatStatus = (chat) => (chat?.counterpart?.isOnline ? 'Online' : chat?.counterpart?.status || 'Offline');
@@ -26,8 +27,7 @@ const previewText = (chat) => {
 const ChatPage = () => {
   const { user } = useAuth();
   const { pushToast } = useToast();
-  const [theme, setTheme] = useThemeMode();
-  const isDark = theme === 'dark';
+  const { theme, setTheme, isDark } = useTheme();
   const isLargeScreen = useMediaQuery('lg');
 
   const [chatSearch, setChatSearch] = useState('');
@@ -98,8 +98,47 @@ const ChatPage = () => {
     inputRef.current?.focus();
   }, [selectedChat?._id, editTarget?._id]);
 
+  // Initialize notifications and request permission
+  useEffect(() => {
+    const initNotifications = async () => {
+      try {
+        await notificationService.initialize();
+        // Request permission if not already granted
+        if (notificationService.permission === 'default') {
+          const granted = await notificationService.requestPermissionWithReason(
+            'to receive message notifications'
+          );
+          if (granted) {
+            pushToast({
+              title: 'Notifications enabled',
+              description: 'You will receive notifications for new messages',
+              tone: 'success'
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to initialize notifications:', error);
+      }
+    };
+
+    initNotifications();
+  }, [pushToast]);
+
+  // Custom handler for incoming messages with notifications
+  const handleIncomingMessageWithNotification = useCallback((message) => {
+    // Call the store handler first
+    handleIncomingMessage(message);
+
+    // Show notification if chat is not currently open
+    if (selectedChat?._id !== message.chatId && notificationService.isAvailable()) {
+      const chat = chats.find((c) => c._id === message.chatId);
+      const senderName = message.senderId?.name || 'Unknown User';
+      notificationService.notifyNewMessage(message, chat, senderName);
+    }
+  }, [selectedChat?._id, chats, handleIncomingMessage]);
+
   const socket = useSocket({
-    'message:new': handleIncomingMessage,
+    'message:new': handleIncomingMessageWithNotification,
     'message:updated': handleUpdatedMessage,
     'message:deleted': (payload) => {
       handleDeletedMessage({ ...payload, currentUserId: user.id || user._id });

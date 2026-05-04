@@ -186,7 +186,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MoreVertical, Settings, Bell, Video, LogOut, SunMedium, MoonStar } from 'lucide-react';
+import { MoreVertical, Settings, Bell, LogOut, SunMedium, MoonStar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Z_INDEX } from '../constants/zIndex';
 import Sidebar from './Sidebar';
@@ -218,7 +218,6 @@ const AppShell = ({
   const mobileMenuItems = [
     { to: '/settings', label: 'Settings', icon: Settings },
     { to: '/notifications', label: 'Notifications', icon: Bell },
-    { to: '/video-calls', label: 'Video Calls', icon: Video },
   ];
 
   return (

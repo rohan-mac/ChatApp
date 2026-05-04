@@ -8,6 +8,10 @@ const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'));
 const ChatPage = lazy(() => import('./pages/chat/ChatPage'));
 const ProfilePage = lazy(() => import('./pages/chat/ProfilePage'));
 const UserSettingsPage = lazy(() => import('./pages/chat/SettingsPage'));
+const CalendarPage = lazy(() => import('./pages/chat/CalendarPage'));
+const CallsPage = lazy(() => import('./pages/chat/CallsPage'));
+const ContactsPage = lazy(() => import('./pages/chat/ContactsPage'));
+const NotificationsPage = lazy(() => import('./pages/chat/NotificationsPage'));
 const DashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
 const UsersPage = lazy(() => import('./pages/admin/UsersPage'));
 const ChatsPage = lazy(() => import('./pages/admin/ChatsPage'));
@@ -50,6 +54,38 @@ const App = () => (
           element={(
             <ProtectedRoute>
               <UserSettingsPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/calendar"
+          element={(
+            <ProtectedRoute>
+              <CalendarPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/calls"
+          element={(
+            <ProtectedRoute>
+              <CallsPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/contacts"
+          element={(
+            <ProtectedRoute>
+              <ContactsPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/notifications"
+          element={(
+            <ProtectedRoute>
+              <NotificationsPage />
             </ProtectedRoute>
           )}
         />

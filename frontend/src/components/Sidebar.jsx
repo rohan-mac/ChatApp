@@ -264,7 +264,6 @@ import {
   Phone,
   Users,
   Calendar,
-  Video,
   MessageCircle
 } from 'lucide-react';
 import { useState } from 'react';
@@ -320,7 +319,6 @@ const Sidebar = ({
   const settingsNavItems = [
     { to: '/settings', label: 'Settings', icon: Settings },
     { to: '/notifications', label: 'Notifications', icon: Bell },
-    { to: '/video-calls', label: 'Video Calls', icon: Video },
   ];
 
   const adminNavItems = user?.role === 'admin'

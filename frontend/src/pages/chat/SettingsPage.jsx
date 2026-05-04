@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, MoonStar, Save, Shield } from 'lucide-react';
+import { Bell, MoonStar, Save, Shield, Sun, Waves, Flower2 } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -14,15 +14,9 @@ const SettingsPage = () => {
   const [readReceiptsEnabled, setReadReceiptsEnabled] = useState(Boolean(user?.readReceiptsEnabled));
 
   const themeOptions = [
-    { name: 'light', label: 'Light', emoji: '☀️', color: 'sky' },
-    { name: 'dark', label: 'Night', emoji: '🌙', color: 'slate' },
-    { name: 'ocean', label: 'Ocean', emoji: '🌊', color: 'cyan' },
-    { name: 'rose', label: 'Rose', emoji: '🌹', color: 'rose' },
-    { name: 'whatsapp-green', label: 'WhatsApp', emoji: '💚', color: 'whatsapp-green' },
-    { name: 'business-blue', label: 'Business', emoji: '💼', color: 'blue' },
-    { name: 'vibrant-purple', label: 'Purple', emoji: '💜', color: 'purple' },
-    { name: 'sunset-orange', label: 'Sunset', emoji: '🌅', color: 'orange' },
-    { name: 'cool-teal', label: 'Teal', emoji: '🟢', color: 'teal' }
+    { name: 'dark', label: 'Night', icon: MoonStar, color: 'slate' },
+    { name: 'ocean', label: 'Ocean', icon: Waves, color: 'cyan' },
+    { name: 'rose', label: 'Rose', icon: Flower2, color: 'rose' }
   ];
 
   const panelClass = theme === 'dark'
@@ -74,32 +68,36 @@ const SettingsPage = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-3">
-              {themeOptions.map((t) => (
-                <button
-                  key={t.name}
-                  type="button"
-                  onClick={() => setTheme(t.name)}
-                  className={`group relative rounded-2xl border p-4 transition-all hover:scale-[1.02] ${
-                    theme === t.name
-                      ? `border-[var(--accent)]/50 bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/30`
-                      : optionClass + ' hover:border-[var(--accent)]/30'
-                  }`}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <span className={`text-lg ${theme === t.name ? 'text-[var(--accent)]' : 'text-slate-500 group-hover:text-[var(--accent)]'}`}>
-                      {t.emoji}
-                    </span>
-                    <span className="text-xs font-medium text-center capitalize">{t.label}</span>
-                    <div 
-                      className={`h-3 w-3 rounded-full mt-1 shadow-sm ${
-                        theme === t.name 
-                          ? 'scale-125 shadow-[var(--accent)]' 
-                          : `bg-${t.color}-400 shadow-md group-hover:scale-110`
-                      }`}
-                    />
-                  </div>
-                </button>
-              ))}
+              {themeOptions.map((t) => {
+                const IconComponent = t.icon;
+                return (
+                  <button
+                    key={t.name}
+                    type="button"
+                    onClick={() => setTheme(t.name)}
+                    className={`group relative rounded-2xl border p-4 transition-all hover:scale-[1.02] ${
+                      theme === t.name
+                        ? `border-[var(--accent)]/50 bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/30`
+                        : optionClass + ' hover:border-[var(--accent)]/30'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <IconComponent 
+                        size={24} 
+                        className={`${theme === t.name ? 'text-[var(--accent)]' : 'text-slate-500 group-hover:text-[var(--accent)]'}`}
+                      />
+                      <span className="text-xs font-medium text-center capitalize">{t.label}</span>
+                      <div 
+                        className={`h-3 w-3 rounded-full mt-1 shadow-sm ${
+                          theme === t.name 
+                            ? 'scale-125 shadow-[var(--accent)]' 
+                            : `bg-${t.color}-400 shadow-md group-hover:scale-110`
+                        }`}
+                      />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </section>
 
