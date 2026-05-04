@@ -1,64 +1,37 @@
-import { useState } from 'react';
-import { Phone, PhoneMissed, Clock, Download, Upload } from 'lucide-react';
+import { useCall } from '../../hooks/useCall';
+import { Phone, PhoneMissed, Clock, Download, Upload, PhoneIncoming, PhoneOutgoing } from 'lucide-react';
 import AppShell from '../../components/AppShell';
 import { useTheme } from '../../context/ThemeContext';
 
 const CallsPage = () => {
   const { theme, setTheme, isDark } = useTheme();
+  const { currentCall, incomingCalls, callDuration } = useCall();
 
-  const calls = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      type: 'incoming',
-      status: 'completed',
-      date: 'Today',
-      time: '3:45 PM',
-      duration: '12m 34s',
-      avatar: '👩‍💼'
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      type: 'outgoing',
-      status: 'completed',
-      date: 'Today',
-      time: '2:15 PM',
-      duration: '5m 22s',
-      avatar: '👨‍💻'
-    },
-    {
-      id: 3,
-      name: 'Emma Davis',
-      type: 'incoming',
-      status: 'missed',
-      date: 'Yesterday',
-      time: '11:30 AM',
-      duration: '—',
-      avatar: '👩‍🦰'
-    },
-    {
-      id: 4,
-      name: 'Alex Turner',
-      type: 'outgoing',
-      status: 'completed',
-      date: 'Yesterday',
-      time: '8:20 PM',
-      duration: '18m 45s',
-      avatar: '👨‍🔬'
-    },
-    {
-      id: 5,
-      name: 'Lisa Anderson',
-      type: 'incoming',
-      status: 'completed',
-      date: '2 days ago',
-      time: '6:00 PM',
-      duration: '7m 10s',
-      avatar: '👩‍🎓'
-    }
-  ];
+  // Demo calls from store + mock recent
+  // const calls = [
+  //   ...(currentCall ? [{
+  //     id: 'active',
+  //     name: 'Active call',
+  //     type: 'outgoing',
+  //     status: 'active',
+  //     duration: formatDuration(callDuration),
+  //     avatar: '📞'
+  //   }] : []),
+  //   ...incomingCalls.slice(-3).map(call => ({
+  //     id: call.id,
+  //     name: 'Incoming',
+  //     type: 'incoming',
+  //     status: 'ringing',
+  //     avatar: '📱'
+  //   }))
+  // ];
 
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+   
   const panelClass = isDark
     ? 'border-white/10 bg-white/5'
     : 'border-white/70 bg-white/85';
@@ -129,7 +102,11 @@ const CallsPage = () => {
                     ) : (
                       <p className="text-sm opacity-60">{call.duration}</p>
                     )}
-                    <button className="mt-2 w-12 h-9 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:shadow-lg transition-all flex items-center justify-center">
+                    <button 
+                      onClick={() => {}} // TODO: Quick dial
+                      className="mt-2 w-12 h-9 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:shadow-lg transition-all flex items-center justify-center"
+                      title="Call again"
+                    >
                       <Phone size={16} />
                     </button>
                   </div>

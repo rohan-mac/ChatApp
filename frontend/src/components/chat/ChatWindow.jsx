@@ -2,8 +2,9 @@
 import { memo, useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import EmojiPicker from 'emoji-picker-react';
-import { LoaderCircle, MoreVertical, Phone, Video, X } from 'lucide-react';
+import { LoaderCircle, MoreVertical, Phone, Video, X, ChevronLeft } from 'lucide-react';
 import { Z_INDEX } from '../../constants/zIndex';
+import { useCall } from '../../hooks/useCall';
 import MessageBubble from '../MessageBubble';
 import InputBar from './InputBar';
 
@@ -43,6 +44,7 @@ const ChatWindow = ({
   const [emojiPickerPosition, setEmojiPickerPosition] = useState('bottom');
   const [attachmentPreview, setAttachmentPreview] = useState(null);
   const emojiContainerRef = useRef(null);
+  const { startCall } = useCall();
 
   const isOcean = theme === 'ocean';
   const isRose = theme === 'rose';
@@ -92,8 +94,12 @@ const ChatWindow = ({
           : 'bg-white border-slate-200/60'
       }`}>
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <button onClick={onBack} className="lg:hidden">
-            <X />
+<button 
+            onClick={onBack} 
+            className="p-2 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--accent)]/10 shadow-sm hover:shadow-md flex items-center justify-center h-10 w-10"
+            aria-label="Back to chat list"
+          >
+            <ChevronLeft size={20} />
           </button>
 
           {selectedChat ? (
@@ -123,20 +129,44 @@ const ChatWindow = ({
 
         {selectedChat && (
           <div className="flex items-center gap-2">
-            <Phone />
-            <Video />
+            <button
+              onClick={() => selectedChat && selectedChat.counterpart?._id && startCall(selectedChat.counterpart._id, 'audio', selectedChat._id)}
+              className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/10 transition-all flex items-center justify-center"
+              title="Audio call"
+            >
+              <Phone size={20} />
+            </button>
+            <button
+              onClick={() => selectedChat && selectedChat.counterpart?._id && startCall(selectedChat.counterpart._id, 'video', selectedChat._id)}
+              className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/10 transition-all flex items-center justify-center"
+              title="Video call"
+            >
+              <Video size={20} />
+            </button>
             <div className="relative">
-              <button onClick={() => setOptionsOpen(!optionsOpen)} className="p-1.5 rounded-full hover:bg-[var(--accent)]/10">
-                <MoreVertical size={18} />
+              <button onClick={() => setOptionsOpen(!optionsOpen)} className="p-2 rounded-full text-[var(--text-primary)] hover:bg-[var(--accent)]/10">
+                <MoreVertical size={20} />
               </button>
-              {optionsOpen && (
+{optionsOpen && (
                 <div className="absolute right-0 top-full mt-1 w-48 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-2xl py-1 z-50 flex flex-col">
-                  <button className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1" onClick={() => pushToast({title: 'View Contact', description: 'Profile page coming soon', tone: 'info'})}>View Contact</button>
-                  <button className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1" onClick={() => pushToast({title: 'Media', description: 'Media gallery coming soon', tone: 'info'})}>Media, links & docs</button>
-                  <button className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1" onClick={() => pushToast({title: 'Search', description: 'Search in chat coming soon', tone: 'info'})}>Search Chat</button>
+                  <button onClick={() => onSetTheme('light')} className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1 flex items-center gap-2">
+                    <div className="w-4 h-4 bg-white border rounded-sm shadow-inner" />
+                    Light
+                  </button>
+                  <button onClick={() => onSetTheme('dark')} className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1 flex items-center gap-2">
+                    <div className="w-4 h-4 bg-slate-900 border rounded-sm shadow-inner" />
+                    Dark
+                  </button>
+                  <button onClick={() => onSetTheme('ocean')} className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1 flex items-center gap-2">
+                    <div className="w-4 h-4 bg-cyan-500 border rounded-sm shadow-inner" />
+                    Ocean
+                  </button>
+                  <button onClick={() => onSetTheme('rose')} className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1 flex items-center gap-2">
+                    <div className="w-4 h-4 bg-rose-500 border rounded-sm shadow-inner" />
+                    Rose
+                  </button>
                   <div className="h-px bg-[var(--border)] my-1"></div>
-<button onClick={onClearChat} className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1">Clear Chat</button>
-                  <button className="px-4 py-2 text-sm hover:bg-red-500/10 text-red-500 rounded-lg mx-1 border-t border-[var(--border)] mt-1" onClick={() => pushToast({title: 'Delete Chat', description: 'Delete chat coming soon', tone: 'error'})}>Delete Chat</button>
+                  <button onClick={onClearChat} className="px-4 py-2 text-sm hover:bg-[var(--accent)]/10 text-[var(--text-primary)] rounded-lg mx-1">Clear Chat</button>
                 </div>
               )}
             </div>
@@ -215,7 +245,7 @@ const ChatWindow = ({
                 }}
                 className="ml-2 px-2 py-1 hover:bg-red-500 rounded transition-colors"
               >
-                ✕ Remove
+                {/* ✕ Remove */}
               </button>
             </div>
           </div>
@@ -235,7 +265,7 @@ const ChatWindow = ({
               }}
               className="px-2 py-1 hover:bg-red-200 rounded transition-colors"
             >
-              ✕ Remove
+              {/* ✕ Remove */}
             </button>
           </div>
         )}

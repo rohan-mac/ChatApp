@@ -198,19 +198,7 @@ const ChatPage = () => {
     localStorage.setItem('chat-themes', JSON.stringify(chatThemes));
   }, [chatThemes]);
 
-  const currentChatTheme = selectedChat?._id ? chatThemes[selectedChat._id] || theme : theme;
-
-  const setChatTheme = (selectedTheme) => {
-    if (!selectedChat?._id) {
-      setTheme(selectedTheme);
-      return;
-    }
-
-    setChatThemes((current) => ({
-      ...current,
-      [selectedChat._id]: selectedTheme
-    }));
-  };
+  const currentChatTheme = theme;
 
   const filteredChats = useMemo(() => {
     const query = deferredChatSearch.trim().toLowerCase();
@@ -388,8 +376,7 @@ const ChatPage = () => {
             onBack={() => setShowConversations(true)}
             onClearChat={handleClearChat}
             pushToast={pushToast}
-            onSetTheme={setChatTheme}
-            // onSetTheme={setChatTheme}
+            onSetTheme={setTheme}
             endRef={endRef}
             draft={draft}
             setDraft={setDraft}
