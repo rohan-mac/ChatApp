@@ -285,17 +285,11 @@ const Sidebar = ({
 
   const isDark = theme === 'dark';
 
-  const sidebarClasses = isDark
-    ? 'border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white backdrop-blur-xl'
-    : 'border-slate-200/50 bg-white/80 text-slate-900 backdrop-blur-xl';
+  const sidebarClasses = 'border-[var(--wa-border)] bg-[var(--wa-sidebar)] text-[var(--wa-text)]';
 
-  const panelClasses = isDark
-    ? 'border-white/10 bg-white/5 hover:bg-white/10'
-    : 'border-slate-200 bg-slate-100 hover:bg-slate-200';
+  const panelClasses = 'border-[var(--wa-border)] bg-[var(--wa-header)] hover:bg-[var(--wa-hover)]';
 
-  const activeClasses = isDark
-    ? 'border-blue-400/40 bg-blue-500/20 shadow-lg'
-    : 'border-blue-300 bg-blue-100 shadow';
+  const activeClasses = 'border-[#25D366]/40 bg-[#25D366]/15 shadow-sm';
 
   const adminActiveClasses = isDark
     ? 'border-red-400/40 bg-red-500/20 shadow-lg'
@@ -378,7 +372,7 @@ const Sidebar = ({
         className={`hidden md:flex flex-col gap-3 border p-3 rounded-3xl w-[72px] lg:w-[80px] flex-shrink-0 shadow-xl ${sidebarClasses}`}
       >
         {/* LOGO */}
-        <div className="flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 h-12 w-full">
+        <div className="flex items-center justify-center rounded-xl bg-[#25D366] h-12 w-full">
           <span className="text-white font-bold text-lg">C</span>
         </div>
 
@@ -418,7 +412,7 @@ const Sidebar = ({
 
             {expandedMenu && (
               <div className="absolute bottom-14 left-0 flex flex-col gap-2 p-2 rounded-xl border bg-slate-900 shadow-xl">
-                {['dark', 'ocean', 'rose'].map((t) => (
+                {['light', 'dark'].map((t) => (
                   <button
                     key={t}
                     onClick={() => {
@@ -429,7 +423,7 @@ const Sidebar = ({
                       theme === t ? 'bg-yellow-400/20' : panelClasses
                     }`}
                   >
-                    {t === 'dark' ? '🌙' : t === 'ocean' ? '🌊' : '🌹'}
+                    {t === 'dark' ? '🌙' : '☀️'}
                   </button>
                 ))}
               </div>
@@ -449,11 +443,7 @@ const Sidebar = ({
       {/* MOBILE BOTTOM NAV */}
       {showMobileBottomNav && (
         <nav
-          className={`fixed bottom-0 left-0 right-0 z-50 flex gap-2 border-t p-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden ${
-            isDark
-              ? 'border-white/10 bg-slate-900/95'
-              : 'border-slate-200 bg-white/95'
-          }`}
+          className="fixed bottom-0 left-0 right-0 z-50 flex gap-2 border-t border-[var(--wa-border)] bg-[var(--wa-sidebar)] p-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
         >
           {mobileBottomItems.map((item) => (
             <MobileNavItem key={item.to} item={item} />

@@ -215,3 +215,89 @@ textarea:focus-visible {
     opacity: 1;
   }
 }
+
+:root,
+html[data-theme='light'],
+html[data-theme='ocean'],
+html[data-theme='rose'] {
+  --wa-primary: #25D366;
+  --wa-dark-green: #128C7E;
+  --wa-chat-bg: #EFEAE2;
+  --wa-sidebar: #FFFFFF;
+  --wa-header: #F0F2F5;
+  --wa-card: #FFFFFF;
+  --wa-search: #F0F2F5;
+  --wa-input-shell: #F0F2F5;
+  --wa-input: #FFFFFF;
+  --wa-bubble-sent: #DCF8C6;
+  --wa-bubble-received: #FFFFFF;
+  --wa-bubble-text: #111B21;
+  --wa-text: #111B21;
+  --wa-muted: #667781;
+  --wa-border: #E9EDEF;
+  --wa-hover: #F5F6F6;
+  --wa-selected: #F0F2F5;
+  --wa-time-sent: #667781;
+}
+
+html[data-theme='dark'] {
+  --wa-primary: #25D366;
+  --wa-dark-green: #128C7E;
+  --wa-chat-bg: #0B141A;
+  --wa-sidebar: #111B21;
+  --wa-header: #202C33;
+  --wa-card: #233138;
+  --wa-search: #202C33;
+  --wa-input-shell: #202C33;
+  --wa-input: #2A3942;
+  --wa-bubble-sent: #005C4B;
+  --wa-bubble-received: #202C33;
+  --wa-bubble-text: #E9EDEF;
+  --wa-text: #E9EDEF;
+  --wa-muted: #8696A0;
+  --wa-border: #2A3942;
+  --wa-hover: #2A3942;
+  --wa-selected: #2A3942;
+  --wa-time-sent: #B6C2C8;
+}
+
+body {
+  font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+.wa-wallpaper {
+  background-color: var(--wa-chat-bg);
+  background-image:
+    radial-gradient(circle at 25px 25px, rgba(17, 27, 33, 0.045) 2px, transparent 0),
+    radial-gradient(circle at 75px 75px, rgba(17, 27, 33, 0.035) 2px, transparent 0),
+    linear-gradient(rgba(239, 234, 226, 0.18), rgba(239, 234, 226, 0.18));
+  background-size: 100px 100px, 100px 100px, auto;
+}
+
+html[data-theme='dark'] .wa-wallpaper {
+  background-image:
+    radial-gradient(circle at 25px 25px, rgba(233, 237, 239, 0.035) 2px, transparent 0),
+    radial-gradient(circle at 75px 75px, rgba(233, 237, 239, 0.028) 2px, transparent 0);
+}
+
+.typing-dots {
+  display: inline-block;
+  min-width: 16px;
+  animation: typing-pulse 1s infinite ease-in-out;
+}
+
+@keyframes typing-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0.72); }
+  80% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
