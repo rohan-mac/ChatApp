@@ -1,208 +1,51 @@
-// import { memo } from 'react';
-// import { LoaderCircle, Paperclip, Send, Smile } from 'lucide-react';
+import { memo, useState } from 'react';
+import { Camera, Contact, FileText, Image, LoaderCircle, MapPin, Paperclip, Send, Smile, Video } from 'lucide-react';
 
-// const InputBar = ({
-//   isDark,
-//   theme,
-//   draft,
-//   onDraftChange,
-//   onToggleEmoji,
-//   onAttachment,
-//   onSend,
-//   disabled,
-//   sending,
-//   hasAttachment,
-//   inputRef,
-//   selectedChat,
-//   socket,
-//   userId
-// }) => {
-//   const isOcean = theme === 'ocean';
-//   const isRose = theme === 'rose';
-//   const sendGradient = isOcean
-//     ? 'from-cyan-500 to-sky-500'
-//     : isRose
-//       ? 'from-fuchsia-500 to-rose-500'
-//       : 'from-[#25D366] to-emerald-400';
+const attachmentItems = [
+  { label: 'Photo', icon: Image, accept: 'image/*' },
+  { label: 'Video', icon: Video, accept: 'video/*' },
+  { label: 'Document', icon: FileText, accept: '.pdf,.doc,.docx,.txt' },
+  { label: 'Camera', icon: Camera, accept: 'image/*' },
+  { label: 'Location', icon: MapPin },
+  { label: 'Contact', icon: Contact }
+];
 
-//   return (
-//     <div className={`rounded-2xl border border-slate-200/60 bg-white/95 px-3 sm:px-4 py-3 shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-slate-950/90`}>
-//       <div className="flex items-end gap-2 sm:gap-3">
-//         <button
-//           type="button"
-//           onClick={onToggleEmoji}
-//           className={`inline-flex flex-shrink-0 h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border transition-all duration-200 hover:scale-105 ${isDark ? 'border-white/20 bg-slate-800/70 text-slate-200 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-sm'}`}
-//           aria-label="Toggle emoji picker"
-//         >
-//           <Smile size={18} className="sm:w-5 sm:h-5" />
-//         </button>
-//         <button
-//           type="button"
-//           onClick={onAttachment}
-//           className={`inline-flex flex-shrink-0 h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border transition-all duration-200 hover:scale-105 ${isDark ? 'border-white/20 bg-slate-800/70 text-slate-200 hover:bg-slate-700' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-sm'}`}
-//           aria-label="Attach file"
-//         >
-//           <Paperclip size={18} className="sm:w-5 sm:h-5" />
-//         </button>
+const InputBar = ({ draft, onDraftChange, onToggleEmoji, onAttachment, onSend, disabled, sending, hasAttachment, inputRef, selectedChat, socket, userId }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
 
-//         <textarea
-//           ref={inputRef}
-//           rows="1"
-//           value={draft}
-//           disabled={disabled}
-//           placeholder={selectedChat ? 'Type a message...' : 'Select a chat to start'}
-//           onChange={(event) => {
-//             onDraftChange(event.target.value);
-//             if (selectedChat?._id) {
-//               socket.emit('chat:typing', {
-//                 chatId: selectedChat._id,
-//                 senderId: userId
-//               });
-//             }
-//           }}
-//           onKeyDown={(event) => {
-//             if (event.key === 'Enter' && !event.shiftKey) {
-//               event.preventDefault();
-//               onSend();
-//             }
-//           }}
-//           className={`h-10 sm:h-12 min-h-[2.5rem] sm:min-h-[3rem] flex-1 resize-none rounded-xl border px-3 sm:px-4 py-2 sm:py-3 text-sm outline-none transition-all duration-200 focus:ring-2 ${
-//             isDark
-//               ? 'border-white/20 bg-slate-800/70 text-white placeholder:text-slate-400 focus:border-blue-400/50 focus:ring-blue-500/20'
-//               : isOcean
-//                 ? 'border-cyan-200/60 bg-cyan-50/80 text-cyan-900 placeholder:text-cyan-500 focus:border-cyan-400/60 focus:ring-cyan-500/30'
-//                 : isRose
-//                   ? 'border-fuchsia-200/60 bg-fuchsia-50/80 text-fuchsia-900 placeholder:text-fuchsia-500 focus:border-fuchsia-400/60 focus:ring-fuchsia-500/30'
-//                   : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-400/40 focus:ring-blue-500/20 shadow-sm'
-//           }`}
-//         />
-
-//         <button
-//           type="button"
-//           onClick={onSend}
-//           disabled={disabled || sending || (!draft.trim() && !hasAttachment)}
-//           className={`inline-flex flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br ${sendGradient} text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100`}
-//           aria-label="Send message"
-//         >
-//           {sending ? <LoaderCircle size={20} className="animate-spin" /> : <Send size={20} />}
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default memo(InputBar);
-
-
-
-import { memo } from 'react';
-import { LoaderCircle, Paperclip, Send, Smile } from 'lucide-react';
-
-const InputBar = ({
-  isDark,
-  theme,
-  draft,
-  onDraftChange,
-  onToggleEmoji,
-  onAttachment,
-  onSend,
-  disabled,
-  sending,
-  hasAttachment,
-  inputRef,
-  selectedChat,
-  socket,
-  userId
-}) => {
-  const isOcean = theme === 'ocean';
-  const isRose = theme === 'rose';
-  const sendGradient = isOcean
-    ? 'from-cyan-500 to-sky-500'
-    : isRose
-      ? 'from-fuchsia-500 to-rose-500'
-      : 'from-[#25D366] to-emerald-400';
+  const emitTyping = () => {
+    if (selectedChat?._id) socket.emit('chat:typing', { chatId: selectedChat._id, senderId: userId });
+  };
 
   return (
-    <div className={`w-full rounded-xl sm:rounded-2xl border border-slate-200/60 bg-white/95 px-2 sm:px-4 py-2.5 sm:py-3 shadow-lg backdrop-blur-sm dark:border-white/20 dark:bg-slate-950/90`}>
-      <div className="flex items-end gap-1.5 sm:gap-3">
-        
-        {/* Emoji Button */}
-        <button
-          type="button"
-          onClick={onToggleEmoji}
-          className={`inline-flex flex-shrink-0 h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-lg sm:rounded-xl border transition-all duration-200 active:scale-95 sm:hover:scale-105 ${
-            isDark
-              ? 'border-white/20 bg-slate-800/70 text-slate-200 hover:bg-slate-700'
-              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-sm'
-          }`}
-          aria-label="Toggle emoji picker"
-        >
-          <Smile size={18} className="sm:w-5 sm:h-5" />
-        </button>
+    <div className="relative flex min-h-[62px] items-center gap-2 bg-[var(--wa-input-shell)] px-3 py-2">
+      <button type="button" onClick={onToggleEmoji} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[var(--wa-muted)] hover:bg-[var(--wa-hover)]" aria-label="Open emoji picker"><Smile size={24} /></button>
 
-        {/* Attachment Button */}
-        <button
-          type="button"
-          onClick={onAttachment}
-          className={`inline-flex flex-shrink-0 h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-lg sm:rounded-xl border transition-all duration-200 active:scale-95 sm:hover:scale-105 ${
-            isDark
-              ? 'border-white/20 bg-slate-800/70 text-slate-200 hover:bg-slate-700'
-              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-sm'
-          }`}
-          aria-label="Attach file"
-        >
-          <Paperclip size={18} className="sm:w-5 sm:h-5" />
-        </button>
-
-        {/* Textarea */}
-        <textarea
-          ref={inputRef}
-          rows="1"
-          value={draft}
-          disabled={disabled}
-          placeholder={selectedChat ? 'Type a message...' : 'Select a chat to start'}
-          onChange={(event) => {
-            onDraftChange(event.target.value);
-            if (selectedChat?._id) {
-              socket.emit('chat:typing', {
-                chatId: selectedChat._id,
-                senderId: userId
-              });
-            }
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              onSend();
-            }
-          }}
-          className={`h-9 sm:h-12 min-h-[2.25rem] sm:min-h-[3rem] max-h-28 sm:max-h-36 flex-1 resize-none overflow-y-auto rounded-lg sm:rounded-xl border px-2.5 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm outline-none transition-all duration-200 focus:ring-2 ${
-            isDark
-              ? 'border-white/20 bg-slate-800/70 text-white placeholder:text-slate-400 focus:border-blue-400/50 focus:ring-blue-500/20'
-              : isOcean
-                ? 'border-cyan-200/60 bg-cyan-50/80 text-cyan-900 placeholder:text-cyan-500 focus:border-cyan-400/60 focus:ring-cyan-500/30'
-                : isRose
-                  ? 'border-fuchsia-200/60 bg-fuchsia-50/80 text-fuchsia-900 placeholder:text-fuchsia-500 focus:border-fuchsia-400/60 focus:ring-fuchsia-500/30'
-                  : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 focus:border-blue-400/40 focus:ring-blue-500/20 shadow-sm'
-          }`}
-        />
-
-        {/* Send Button */}
-        <button
-          type="button"
-          onClick={onSend}
-          disabled={disabled || sending || (!draft.trim() && !hasAttachment)}
-          className={`inline-flex flex-shrink-0 h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br ${sendGradient} text-white shadow-lg transition-all duration-200 active:scale-95 sm:hover:scale-105 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100`}
-          aria-label="Send message"
-        >
-          {sending ? (
-            <LoaderCircle size={18} className="animate-spin sm:w-5 sm:h-5" />
-          ) : (
-            <Send size={18} className="sm:w-5 sm:h-5" />
-          )}
-        </button>
-
+      <div className="relative order-3 sm:order-none">
+        <button type="button" onClick={() => setMenuOpen((value) => !value)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[var(--wa-muted)] hover:bg-[var(--wa-hover)]" aria-label="Open attachment menu"><Paperclip size={23} /></button>
+        {menuOpen ? (
+          <div className="absolute bottom-12 right-0 z-30 grid w-48 gap-1 rounded-xl border border-[var(--wa-border)] bg-[var(--wa-card)] p-2 text-[14px] text-[var(--wa-text)] shadow-2xl animate-[menu-in_.16s_ease-out]">
+            {attachmentItems.map(({ label, icon: Icon, accept }) => (
+              <button key={label} type="button" onClick={() => { setMenuOpen(false); if (accept) onAttachment(); }} className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[var(--wa-hover)]"><Icon size={18} />{label}</button>
+            ))}
+          </div>
+        ) : null}
       </div>
+
+      <textarea
+        ref={inputRef}
+        rows="1"
+        value={draft}
+        disabled={disabled}
+        placeholder={selectedChat ? 'Type a message' : 'Select a chat to start'}
+        onChange={(event) => { onDraftChange(event.target.value); emitTyping(); }}
+        onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); onSend(); } }}
+        className="max-h-32 min-h-[42px] flex-1 resize-none rounded-full border-0 bg-[var(--wa-input)] px-4 py-2.5 text-[15px] text-[var(--wa-text)] outline-none placeholder:text-[var(--wa-muted)] focus:ring-2 focus:ring-[#25D366]/40"
+      />
+
+      <button type="button" onClick={onSend} disabled={disabled || sending || (!draft.trim() && !hasAttachment)} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#25D366] text-white shadow-sm transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50" aria-label="Send message">
+        {sending ? <LoaderCircle size={20} className="animate-spin" /> : <Send size={20} />}
+      </button>
     </div>
   );
 };

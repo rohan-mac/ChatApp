@@ -48,7 +48,7 @@
 //           />
 //         )}
 
-//         <div className={`relative z-10 flex flex-col flex-1 rounded-2xl md:rounded-3xl shadow-2xl min-h-fit md:min-h-[calc(100vh-4rem)] ${shellClasses} ${showSidebar ? 'mb-24 md:mb-0' : ''}`}>
+//         <div className={`relative z-10 flex flex-col flex-1 rounded-none shadow-none min-h-fit md:min-h-[calc(100vh-4rem)] ${shellClasses} ${showSidebar ? 'mb-24 md:mb-0' : ''}`}>
 //           {showHeader ? (
 //             <header className={`flex items-center justify-between gap-2 sm:gap-4 border-b px-4 sm:px-6 py-4 sm:py-5 ${isDark ? 'border-white/20 bg-gradient-to-r from-slate-800/50 to-slate-900/50 backdrop-blur-sm' : 'border-slate-200/50 bg-gradient-to-r from-white/80 to-slate-50/80 backdrop-blur-sm'}`}>
 //               <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
@@ -211,9 +211,7 @@ const AppShell = ({
 
   const isDark = theme === 'dark';
 
-  const shellClasses = isDark
-    ? 'border-white/20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-2xl'
-    : 'border-slate-200/50 bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900 shadow-xl';
+  const shellClasses = 'border-[var(--wa-border)] bg-[var(--wa-chat-bg)] text-[var(--wa-text)] shadow-none';
 
   const mobileMenuItems = [
     { to: '/settings', label: 'Settings', icon: Settings },
@@ -221,17 +219,10 @@ const AppShell = ({
   ];
 
   return (
-    <div className={`h-[100dvh] w-full overflow-hidden ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'}`}>
-
-      {/* Background Effects */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-32 top-16 h-96 w-96 rounded-full bg-gradient-to-r from-blue-200/30 to-purple-200/30 blur-3xl" />
-        <div className="absolute right-[-8rem] top-1/3 h-[32rem] w-[32rem] rounded-full bg-gradient-to-r from-purple-200/20 to-pink-200/20 blur-3xl" />
-        <div className="absolute bottom-0 left-1/2 h-80 w-80 -translate-x-1/2 translate-y-1/2 rounded-full bg-gradient-to-r from-cyan-200/25 to-blue-200/25 blur-3xl" />
-      </div>
+    <div className="h-[100dvh] w-full overflow-hidden bg-[var(--wa-chat-bg)] text-[var(--wa-text)]">
 
       {/* MAIN LAYOUT */}
-      <div className="relative flex h-full w-full flex-col md:flex-row gap-2 md:gap-4  sm:p-3 md:p-5 lg:p-6">
+      <div className="relative flex h-full w-full flex-col md:flex-row gap-0 p-0">
 
         {/* SIDEBAR */}
         {showSidebar && (
@@ -251,7 +242,7 @@ const AppShell = ({
 
         {/* MAIN PANEL */}
         <div
-          className={`relative z-10 flex flex-col flex-1 rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden ${shellClasses} ${
+          className={`relative z-10 flex flex-col flex-1 rounded-none shadow-none overflow-hidden ${shellClasses} ${
             showSidebar && showMobileBottomNav ? 'mb-20 md:mb-0' : ''
           }`}
         >

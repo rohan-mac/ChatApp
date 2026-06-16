@@ -182,13 +182,12 @@ const ChatPage = () => {
   const unreadCount = useMemo(() => chats.filter((chat) => chat.unreadCount > 0).length, [chats]);
 
   const themeOptions = [
-    { id: 'dark', label: 'Night' },
-    { id: 'ocean', label: 'Ocean' },
-    { id: 'rose', label: 'Rose' }
+    { id: 'light', label: 'Light' },
+    { id: 'dark', label: 'Dark' }
   ];
 
   const rotateTheme = () => {
-    const themeOrder = ['dark', 'ocean', 'rose'];
+    const themeOrder = ['light', 'dark'];
     const currentIndex = themeOrder.indexOf(theme);
     const nextIndex = (currentIndex + 1) % themeOrder.length;
     setTheme(themeOrder[nextIndex]);
@@ -316,7 +315,7 @@ const ChatPage = () => {
         </button>
       ) : null}
     >
-      <div className="grid h-full min-h-0 w-full gap-3 overflow-hidden lg:grid-cols-[360px_minmax(0,1fr)]">
+      <div className="grid h-full min-h-0 w-full overflow-hidden bg-[var(--wa-chat-bg)] lg:grid-cols-[380px_minmax(0,1fr)]">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
