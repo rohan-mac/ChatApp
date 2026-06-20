@@ -6,7 +6,10 @@ import { useCall } from '../../context/CallContext';
 import MessageBubble from '../MessageBubble';
 import InputBar from './InputBar';
 
-const ChatWindow = ({ isDark, selectedChat, typingText, getChatName, getChatStatus, loadingMessages, activeMessages, currentUserId, onEdit, onDelete, onToggleStar, onBack, endRef, draft, setDraft, showEmoji, setShowEmoji, fileRef, setAttachment, performSend, sending, inputRef, socket, attachment, setEditTarget, editTarget, theme, onClearChat, onSetTheme }) => {
+const ChatWindow = ({ isDark, selectedChat, typingText, getChatName, getChatStatus, loadingMessages, activeMessages, currentUserId, onEdit, onDelete, onToggleStar, onBack, endRef, draft, setDraft, showEmoji, setShowEmoji, fileRef, setAttachment, performSend, sending, inputRef, socket, attachment, setEditTarget, editTarget, theme, onClearChat, onSetTheme, onViewportRead }) => { 
+  const viewedRef = useRef(new Set());
+  const observerRef = useRef(null);
+
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [attachmentPreview, setAttachmentPreview] = useState(null);
   const emojiRef = useRef(null);

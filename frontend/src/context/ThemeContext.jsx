@@ -8,11 +8,11 @@ const THEME_ORDER = ['dark', 'ocean', 'rose', 'light'];
 export const ThemeProvider = ({ children }) => {
   const auth = useAuth();
   const user = auth?.user;
-  const [theme, setThemeState] = useState(() => 
-    typeof window !== 'undefined' 
-      ? localStorage.getItem('chat-theme') || user?.themePreference || 'dark'
+  const [theme, setThemeState] = useState(() => (
+    typeof window !== 'undefined'
+      ? localStorage.getItem('chat-theme') || user?.themePreference || 'whatsapp-green'
       : 'dark'
-  );
+  ));
 
   // Apply theme to document
   useEffect(() => {

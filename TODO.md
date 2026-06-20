@@ -1,17 +1,9 @@
-# Call UI Enhancements (WhatsApp-style Popups/Pages)
-## Completed
-- [x] Analyzed repo - Core incoming popup exists in CallModal.jsx, globals in main.jsx
-- [x] 1. Enhanced CallModal.jsx - Added outgoing "Calling..." state, real names/avatars, conditional buttons/status
+# TODO
 
-## Plan Steps
-2. [x] Fixed ChatWindow.jsx - Corrected `useCall` import to CallContext, polished call buttons with motion/shadow
-3. [x] Updated callStore.js - Added callHistory[] (tracks ended calls w/ duration/dir), clearHistory()
-4. [x] Updated CallsPage.jsx - Real history UI w/ avatars, direction icons (incoming/outgoing), duration, quick redial, empty state, animations
-5. [ ] Polish active screens (VideoCallScreen/AudioCallScreen) + ensure full integration
-6. [ ] Test full flow
+- [x] Step 1: Update ThemeContext default fallback theme to `whatsapp-green`.
+- [x] Step 2: Update AuthShell to support `variant="whatsapp"` (WhatsApp-style white theme, centered layout).
+- [x] Step 3: Update LoginPage to use `AuthShell variant="whatsapp"` and adjust WhatsApp-like button/link styling.
+- [x] Step 4: Update RegisterPage similarly to use `AuthShell variant="whatsapp"` and adjust button/link styling.
+- [ ] Step 5: Run frontend dev build/test to ensure UI renders without errors.
 
-## Testing
-- cd frontend && npm run dev
-- cd backend && npm run dev  
-- Open 2 browser tabs (different users), test audio/video calls: initiate → incoming/outgoing popup → answer/decline → active screen → end
 

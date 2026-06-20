@@ -5,7 +5,12 @@ const hasUser = (list = [], id) => list.some((entry) => (entry?._id || entry) ==
 const getStatus = (message, currentUserId) => {
   if (message.failed || message.status === 'failed') return 'failed';
   if (message.pending || message.status === 'pending' || !message._id) return 'pending';
-  if (hasUser(message.seenBy, currentUserId) || message.status === 'seen' || message.readAt) return 'seen';
+  const seenList = message.seenBy || message.readBy;
+  if (hasUser(seenList, currentUserId) || message.status === 'seen') return 'seen';
+
+  // delivered is typically the recipients list
+  const deliveredList = message.deliveredTo || message.deliveredBy;
+  if (Array.isArray(deliveredList) && deliveredList.length) return 'delivered';
   if (message.deliveredAt || message.status === 'delivered' || message.delivered) return 'delivered';
   return 'sent';
 };

@@ -142,12 +142,13 @@ const LoginPage = () => {
 
   return (
     <AuthShell
+      variant="whatsapp"
       title="Welcome Back 👋"
       subtitle="Login to continue chatting"
       footer={
         <p className="text-sm">
           Don’t have an account?{' '}
-          <Link to="/register" className="font-semibold text-blue-500 hover:underline">
+          <Link to="/register" className="font-semibold text-[var(--wa-primary)] hover:underline">
             Sign up
           </Link>
         </p>
@@ -198,8 +199,7 @@ const LoginPage = () => {
           whileHover={{ scale: 1.01 }}
           disabled={submitting}
           className="w-full h-12 sm:h-14 rounded-2xl font-semibold text-white 
-          bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 
-          shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+          bg-[var(--wa-primary)] shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70"
         >
           {submitting ? (
             <LoaderCircle size={18} className="animate-spin" />

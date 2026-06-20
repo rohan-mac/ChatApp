@@ -219,10 +219,11 @@ const AppShell = ({
   ];
 
   return (
-    <div className="h-[100dvh] w-full overflow-hidden bg-[var(--wa-chat-bg)] text-[var(--wa-text)]">
+      <div className="h-[100dvh] w-full overflow-x-hidden overflow-y-hidden bg-[var(--wa-chat-bg)] text-[var(--wa-text)]">
 
       {/* MAIN LAYOUT */}
-      <div className="relative flex h-full w-full flex-col md:flex-row gap-0 p-0">
+      <div className="relative flex h-full w-full flex-col md:flex-row gap-0 p-0 overflow-x-hidden">
+
 
         {/* SIDEBAR */}
         {showSidebar && (
@@ -287,7 +288,9 @@ const AppShell = ({
 
                   {showMobileMenu && (
                     <div
-                      className={`absolute right-0 top-12 z-50 flex flex-col gap-1 rounded-xl border p-2 shadow-xl min-w-[170px] ${
+                      className={`absolute top-12 z-50 flex flex-col gap-1 rounded-xl border p-2 shadow-xl min-w-[170px] max-w-[calc(100vw-32px)] ${
+                        // Align dropdown right edge to the icon but prevent overflow
+                        'right-4',
                         isDark
                           ? 'border-white/20 bg-slate-900'
                           : 'border-slate-200 bg-white'

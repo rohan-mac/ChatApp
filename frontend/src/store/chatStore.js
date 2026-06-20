@@ -69,8 +69,21 @@ export const useChatStore = create((set, get) => ({
   sendMessage: async (payload) => {
     const { data } = await api.post('/messages', payload);
     const message = normalizeMessage(unpackData(data));
-    set((state) => ({ messages: upsertById(state.messages, message) }));
-    await get().loadChats();
+    set((state) => {
+      const isOpen = state.selectedChat?._id === message.chatId;
+      return {
+        messages: isOpen ? upsertById(state.messages, message) : state.messages,
+        chats: state.chats.map((chat) =>
+          chat._id === message.chatId
+            ? {
+                ...chat,
+                lastMessageId: message,
+                unreadCount: isOpen ? 0 : Math.min((chat.unreadCount || 0) + 1, 999)
+              }
+            : chat
+        )
+      };
+    });
     return message;
   },
 
@@ -111,7 +124,6 @@ export const useChatStore = create((set, get) => ({
                 : entry
             )
     }));
-    await get().loadChats();
   },
 
   archiveSelectedChat: async () => {
@@ -148,10 +160,19 @@ export const useChatStore = create((set, get) => ({
     set((state) => {
       const isOpen = state.selectedChat?._id === incoming.chatId;
       return {
-        messages: isOpen ? upsertById(state.messages, incoming) : state.messages
+        messages: isOpen ? upsertById(state.messages, incoming) : state.messages,
+        chats: state.chats.map((chat) => {
+          if (chat._id !== incoming.chatId) return chat;
+          return {
+            ...chat,
+            lastMessageId: incoming,
+            // if the chat isn't open, increment unread locally for snappy UI
+            unreadCount:
+              isOpen ? 0 : Math.min((chat.unreadCount || 0) + 1, 999)
+          };
+        })
       };
     });
-    get().loadChats();
   },
 
   handleUpdatedMessage: (message) => {
@@ -178,7 +199,6 @@ export const useChatStore = create((set, get) => ({
                 : entry
             )
     }));
-    get().loadChats();
   },
 
   handlePresenceUpdate: ({ userId, isOnline, lastSeen }) => {
@@ -194,19 +214,14 @@ export const useChatStore = create((set, get) => ({
     }));
   },
 
-  markChatAsRead: (socket, currentUserId) => {
-    const { messages, selectedChat } = get();
-    if (!socket || !selectedChat?._id || !messages.length) return;
+  markMessageReadByViewport: ({ socket, chatId, messageIds, currentUserId }) => {
+    if (!socket || !chatId || !Array.isArray(messageIds) || messageIds.length === 0) return;
 
-    messages.forEach((message) => {
-      if (message.senderId._id !== currentUserId && !message.seenBy?.some((id) => id === currentUserId || id._id === currentUserId)) {
-        socket.emit('message:seen', {
-          messageId: message._id,
-          chatId: selectedChat._id
-        });
-      }
+    // Emit the new read event. Server will update seenBy accordingly.
+    socket.emit('messages_read', {
+      chatId,
+      userId: currentUserId,
+      messageIds
     });
-
-    get().loadChats();
   }
 }));

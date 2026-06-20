@@ -4,6 +4,17 @@ import { EllipsisVertical, FileText, Pencil, Star, StarOff, Trash2 } from 'lucid
 import { formatClockTime } from '../utils/time';
 import MessageStatus from './chat/MessageStatus';
 
+const formatMessageTime = (value) => {
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+};
+
+
+/**
+ * Render attachment based on type
+ */
 const renderAttachment = (attachment) => {
   if (!attachment) return null;
   const { url, type, name } = attachment;

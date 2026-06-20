@@ -6,6 +6,8 @@ import { Report } from '../models/Report.js';
 import { User } from '../models/User.js';
 import { uploadAttachment } from '../services/mediaService.js';
 import { sendPushNotification } from '../services/notificationService.js';
+import { Notification } from '../models/Notification.js';
+
 import { evaluateMessageSpam } from '../services/spamService.js';
 import { logger } from '../utils/logger.js';
 
@@ -113,8 +115,11 @@ export const sendMessage = asyncHandler(async (req, res) => {
     messageType,
     attachments,
     replyTo: replyTo || null,
-    deliveredTo: [req.user._id],
-    seenBy: [req.user._id],
+    // WhatsApp-like receipts:
+    // - deliveredTo should be the receiver (added later via socket message:delivered)
+    // - seenBy should be the receiver only after chat is opened (socket message:seen)
+    deliveredTo: [],
+    seenBy: [],
     clientMessageId,
     isSpam: spam.isSpam
   });
@@ -130,19 +135,48 @@ export const sendMessage = asyncHandler(async (req, res) => {
   const recipientIds = chat.participants.filter(
     (participantId) => participantId.toString() !== req.user._id.toString()
   );
-  const recipients = await User.find({ _id: { $in: recipientIds } }).select('pushTokens');
 
-  // Send push notifications
+  // Sender info for payload + title
+  const sender = await User.findById(req.user._id).select('name profilePic');
+
+  // Notification history + push
+  const recipients = await User.find({ _id: { $in: recipientIds } }).select('pushTokens isOnline name');
+
   await Promise.all(
-    recipients.map((recipient) =>
-      sendPushNotification({
-        user: recipient,
-        title: 'New message',
-        body: text || 'Attachment received',
-        data: { chatId: chat._id.toString(), messageId: message._id.toString() }
-      })
-    )
+    recipients.map(async (recipient) => {
+      // Persist notification history (even if online)
+      await Notification.create({
+        userId: recipient._id,
+        senderId: req.user._id,
+        chatId: chat._id,
+        title: sender?.name ? `${sender.name}` : 'New message',
+        message: text || 'Attachment received',
+        type: 'message',
+        read: false,
+        messageId: message._id
+      }).catch((e) => {
+        // Ignore duplicate key errors (idempotency)
+        if (!e?.code || !String(e.code).includes('11000')) return;
+      });
+
+      // If recipient is offline, send push notification
+      if (!recipient.isOnline) {
+        await sendPushNotification({
+          user: recipient,
+          title: sender?.name || 'New message',
+          body: text || 'Attachment received',
+          data: {
+            type: 'message',
+            chatId: chat._id.toString(),
+            senderId: req.user._id.toString(),
+            senderName: sender?.name || 'Unknown',
+            messageId: message._id.toString()
+          }
+        });
+      }
+    })
   );
+
 
   // Emit real-time update
   const io = req.app.get('io');

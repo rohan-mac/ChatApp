@@ -87,7 +87,20 @@ const formatLastSeen = (value) => {
   });
 };
 
-const UserList = ({ users, onSelect, selectedId, theme, palette }) => (
+const UserList = ({
+  users,
+  onSelect,
+  selectedId,
+  theme,
+  palette = {
+    // Non-glass, solid/clean styling
+    selected:
+      'border-[var(--wa-accent)] bg-[var(--wa-accent)]/15 shadow-sm',
+    idle: 'border-[var(--wa-border)] bg-transparent',
+    secondaryText: 'text-[var(--wa-muted)]',
+    accent: 'from-indigo-500 to-sky-400'
+  }
+}) => (
   <div className="space-y-2 sm:space-y-3 px-1 sm:px-0">
     {users.map((user, index) => {
       const isSelected = selectedId === user._id;

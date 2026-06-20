@@ -149,12 +149,13 @@ const RegisterPage = () => {
 
   return (
     <AuthShell
+      variant="whatsapp"
       title="Create Account ✨"
       subtitle="Join and start chatting instantly"
       footer={
         <p className="text-sm">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-blue-500 hover:underline">
+<Link to="/login" className="font-semibold text-[var(--wa-primary)] hover:underline">
             Sign in
           </Link>
         </p>
@@ -211,7 +212,7 @@ const RegisterPage = () => {
           whileHover={{ scale: 1.01 }}
           disabled={submitting}
           className="w-full h-12 sm:h-14 rounded-2xl font-semibold text-white 
-          bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 
+          bg-[var(--wa-primary)] 
           shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70"
         >
           {submitting ? (

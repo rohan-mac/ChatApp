@@ -159,10 +159,10 @@ const ChatPage = () => {
     return () => socket.emit('chat:leave', selectedChat._id);
   }, [selectedChat?._id, socket]);
 
-  useEffect(() => {
-    if (!selectedChat?._id || !messages.length || !socket.connected) return;
-    markChatAsRead(socket, user.id || user._id);
-  }, [selectedChat?._id, messages.length, socket.connected, markChatAsRead, user]);
+  // Read receipts are now handled by per-message viewport tracking (IntersectionObserver)
+  // so we only mark messages as read when the receiver actually views them.
+  // (No auto-mark on chat open.)
+  
 
   useEffect(() => {
     if (!selectedChat?._id) {
@@ -347,7 +347,7 @@ const ChatPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className={`h-full min-h-0 ${showConversations ? 'hidden lg:flex' : 'flex'} flex-col`}
         >
-          <ChatWindow
+            <ChatWindow
             isDark={isDark}
             selectedChat={selectedChat}
             typingText={typingText}
@@ -391,6 +391,18 @@ const ChatPage = () => {
             setEditTarget={setEditTarget}
             editTarget={editTarget}
             theme={currentChatTheme}
+            onViewportRead={(messageIds) => {
+              const chatId = selectedChat?._id;
+              const currentUserId = user.id || user._id;
+              if (!chatId) return;
+              // Only call store method; store emits messages_read event
+              useChatStore.getState().markMessageReadByViewport({
+                socket,
+                chatId,
+                messageIds,
+                currentUserId
+              });
+            }}
           />
         </motion.div>
       </div>
