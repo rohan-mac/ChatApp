@@ -58,6 +58,7 @@ const ChatPage = () => {
   const messages = useChatStore((state) => state.messages);
   const selectedChat = useChatStore((state) => state.selectedChat);
   const loadingChats = useChatStore((state) => state.loadingChats);
+  const loadingPeople = useChatStore((state) => state.loadingPeople);
   const loadingMessages = useChatStore((state) => state.loadingMessages);
   const people = useChatStore((state) => state.people);
   const loadChats = useChatStore((state) => state.loadChats);

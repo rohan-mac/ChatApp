@@ -24,6 +24,7 @@ export const useChatStore = create((set, get) => ({
   messages: [],
   selectedChat: null,
   loadingChats: false,
+  loadingPeople: false,
   loadingMessages: false,
   people: [],
   messageSearchResults: [],
